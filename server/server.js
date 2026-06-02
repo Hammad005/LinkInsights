@@ -8,6 +8,9 @@ import { addNewClick } from "./src/controllers/clickController.js";
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Trust proxy to get real client IP from headers
+app.set('trust proxy', 1);
+
 app.use(
   cors({ origin: "*", methods: ["GET", "POST", "PUT", "PATCH", "DELETE"] }),
 );

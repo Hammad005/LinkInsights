@@ -14,8 +14,11 @@ export const addNewClick = async (req, res) => {
             return res.status(410).json({ error: "Link has expired" });
         }
 
-        // Ip
-        const ip = req.ip || req.connection.remoteAddress;
+        // Ip - Extract real client IP (handles proxy/load balancer scenarios)
+        const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                   req.headers['x-real-ip'] || 
+                   req.ip || 
+                   req.connection.remoteAddress;
         
         
         // Geo Location
