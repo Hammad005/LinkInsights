@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./src/database/connectDB.js";
 import "dotenv/config";
-import linksRoutes from "./src/routes/LinksRoutes.js";
+import linksRoutes from "./src/routes/linksRoutes.js";
 import { addNewClick } from "./src/controllers/clickController.js";
 
 const app = express();
@@ -20,4 +20,3 @@ app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on port ${PORT}`);
 });
-connectDB();
