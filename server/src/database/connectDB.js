@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import dns from "dns";
-dns.setServers(['1.1.1.1']);
+if (process.env.NODE_ENV !== "production") {
+    dns.setServers(['1.1.1.1']);
+}
 
 const connectDB = async () => {
     try {
