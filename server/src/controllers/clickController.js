@@ -6,8 +6,7 @@ import {UAParser} from 'ua-parser-js';
 export const addNewClick = async (req, res) => {
     try {
         const link = await Link.findOne({ shortCode: '/' + req.params.code });
-        console.log(req.params.code);
-        
+
         if (!link) return res.status(404).json({ error: "Link not found" });
 
         // Expiry check
@@ -17,9 +16,11 @@ export const addNewClick = async (req, res) => {
 
         // Ip
         const ip = req.ip || req.connection.remoteAddress;
-
+        
+        
         // Geo Location
         const geo = geoip.lookup(ip);
+        
 
         // Device Info
         const parser = new UAParser(req.headers['user-agent']);
@@ -29,7 +30,7 @@ export const addNewClick = async (req, res) => {
         // Save click info
         await Click.create({
             linkId: link.shortCode,
-            ip,
+            ipAddress: ip,
             country: geo?.country || "Unknown",
             device: ua.device.type || "desktop",
             browser: ua.browser.name,
