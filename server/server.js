@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./src/database/connectDB.js";
 import "dotenv/config";
+import authRoutes from "./src/routes/authRoutes.js";
 import linksRoutes from "./src/routes/linksRoutes.js";
 import { addNewClick } from "./src/controllers/clickController.js";
 
@@ -14,8 +15,10 @@ app.set('trust proxy', 1);
 app.use(
   cors({ origin: "*", methods: ["GET", "POST", "PUT", "PATCH", "DELETE"] }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+app.use('/auth', authRoutes);
 app.use("/links", linksRoutes);
 app.use("/:code", addNewClick); // Handle clicks on short URLs
 
