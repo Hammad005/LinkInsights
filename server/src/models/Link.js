@@ -17,10 +17,10 @@ const linkSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    // createdBy: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    // },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
 }, {timestamps: true});
 
 const Link = mongoose.model("Link", linkSchema);

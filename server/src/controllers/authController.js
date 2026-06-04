@@ -21,13 +21,14 @@ export const Me = async (req, res) => {
 
 export const Signup = async (req, res) => {
   try {
-
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     } else if (password.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters long" });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters long" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -41,7 +42,6 @@ export const Signup = async (req, res) => {
     const user = await User.create({ name, email, password: hashedPassword });
 
     jwtSign(user, res, "7d");
-
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: error.message || "Failed to create user" });
@@ -75,7 +75,13 @@ export const Login = async (req, res) => {
 
 export const Logout = async (req, res) => {
   try {
-    res.status(200).json({ message: "Logged out successfully", user: null, accessToken: null });
+    res
+      .status(200)
+      .json({
+        message: "Logged out successfully",
+        user: null,
+        accessToken: null,
+      });
   } catch (error) {
     console.error("Error logging out:", error);
     res.status(500).json({ error: error.message || "Failed to log out" });
@@ -87,30 +93,141 @@ export const SendForgetPasswordOTP = async (req, res) => {
     const { email } = req.body;
     if (!email) {
       return res.status(400).json({ error: "Email is required" });
-    };
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: "No user found with this email" });
+    }
+
+    const otp = otpGenerator();
+    const mailOptions = {
+      email,
+      subject: "LinkInsights - Forget Password Code",
+      html: forgotPasswordOtpEmailTemplate(otp, 5),
+    };
+
+    const hasedOtp = await bcrypt.hash(otp, 10);
+    user.forgotPasswordOTP = hasedOtp;
+    user.forgotPasswordOTPExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+    await user.save();
+    await sendEmail(mailOptions);
+
+    return res.status(200).json({ message: `OTP sent successfully to ${email}` });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ error: error.message || "Failed to send OTP" });
+  }
+};
+
+export const VerifiyForgotPasswordOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "No user found with this email" });
+    }
+
+    if (
+      !user.forgotPasswordOTPExpiry ||
+      user.forgotPasswordOTPExpiry < Date.now()
+    ) {
+      return res.status(400).json({ error: "OTP expired" });
+    }
+
+    const isOtpValid = await bcrypt.compare(otp, user.forgotPasswordOTP);
+    if (!isOtpValid) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    user.forgotPasswordOTPVerified = true;
+    await user.save();
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ error: error.message || "Failed to verify OTP" });
+  }
+};
+
+export const ResendForgotPasswordOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "No user found with this email" });
+    }
+
+    const now = new Date();
+
+    if (
+      user.forgotPasswordOTPExpiry &&
+      user.forgotPasswordOTPExpiry > now - 60 * 1000
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Please wait before resending another OTP" });
     };
 
     const otp = otpGenerator();
     const mailOptions = {
       email,
       subject: "LinkInsights - Forget Password Code",
-      html: forgotPasswordOtpEmailTemplate(OTP, 5),
+      html: forgotPasswordOtpEmailTemplate(otp, 5),
     };
 
     const hasedOtp = await bcrypt.hash(otp, 10);
-    user.forgetPasswordOtp = hasedOtp;
-    user.forgetPasswordOtpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    user.forgotPasswordOTP = hasedOtp;
+    user.forgotPasswordOTPExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
     await user.save();
     await sendEmail(mailOptions);
 
-    return res.status(200).json({ message: "OTP sent successfully" });
+    return res.status(200).json({ message: `OTP resent successfully to ${email}` });
   } catch (error) {
     console.error("Error sending OTP:", error);
     res.status(500).json({ error: error.message || "Failed to send OTP" });
+  }
+};
+
+export const ForgotPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: "All fields are required" });
+    } else if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters long" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "No user found with this email" });
+    }
+
+    if (!user.forgotPasswordOTPVerified) {
+      return res.status(400).json({ error: "OTP not verified" });
+    };
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.forgotPasswordOTP= null;
+    user.forgotPasswordOTPExpiry = null;
+    user.forgotPasswordOTPVerified = false;
+    await user.save();
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ error: error.message || "Failed to reset password" });
   }
 };
 
@@ -131,7 +248,7 @@ export const UpdateProfilePic = async (req, res) => {
         (error, result) => {
           if (error) return reject(error);
           resolve(result);
-        }
+        },
       );
 
       streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -154,7 +271,6 @@ export const UpdateProfilePic = async (req, res) => {
       message: "Profile pic updated successfully",
       newProfilePic: uploadResult.secure_url,
     });
-
   } catch (error) {
     console.error("Error updating profile pic:", error);
     return res.status(500).json({
@@ -170,10 +286,22 @@ export const UpdateUserData = async (req, res) => {
     user.name = name || user.name;
     user.email = email || user.email;
     await user.save();
-    return res.status(200).json({ message: name && email ? "Name and email updated successfully" : name ? "Name updated successfully" : "Email updated successfully", userData: { name: user.name, email: user.email } });
+    return res
+      .status(200)
+      .json({
+        message:
+          name && email
+            ? "Name and email updated successfully"
+            : name
+              ? "Name updated successfully"
+              : "Email updated successfully",
+        userData: { name: user.name, email: user.email },
+      });
   } catch (error) {
     console.error("Error updating user data:", error);
-    res.status(500).json({ error: error.message || "Failed to update user data" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to update user data" });
   }
 };
 
@@ -183,19 +311,21 @@ export const ResetPassword = async (req, res) => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({ error: "All fields are required" });
     } else if (newPassword.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters long" });
-    };
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters long" });
+    }
 
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match" });
-    };
+    }
 
     const user = req.user;
 
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid Old Password" });
-    };
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -205,6 +335,8 @@ export const ResetPassword = async (req, res) => {
     return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error("Error resetting password:", error);
-    res.status(500).json({ error: error.message || "Failed to reset password" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to reset password" });
   }
 };

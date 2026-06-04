@@ -12,7 +12,7 @@ const sendEmail = async (opt) => {
 
     const mailOptions = {
         from: process.env.EMAIL_MAIL,
-        to: opt.to,
+        to: opt.email,
         subject: opt.subject,
         html: opt.html
     }

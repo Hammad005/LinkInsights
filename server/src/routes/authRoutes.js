@@ -1,5 +1,5 @@
 import express from 'express';
-import { Login, Logout, Me, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData } from '../controllers/authController.js';
+import { ForgotPassword, Login, Logout, Me, ResendForgotPasswordOTP, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData, VerifiyForgotPasswordOTP } from '../controllers/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import multerUploadMiddleware from '../middleware/multerUploadMiddleware.js';
 
@@ -13,6 +13,9 @@ router.post('/signup', Signup);
 router.post('/login', Login);
 router.post('/logout', Logout);
 router.post('/sendForgetPasswordOTP', SendForgetPasswordOTP);
+router.post('/verifiyForgotPasswordOTP', VerifiyForgotPasswordOTP);
+router.post('/resendForgotPasswordOTP', ResendForgotPasswordOTP);
+router.post('/forgotPassword', ForgotPassword);
 
 
 // All Put Requests
