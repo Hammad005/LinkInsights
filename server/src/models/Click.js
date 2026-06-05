@@ -11,9 +11,6 @@ const clickSchema = new mongoose.Schema({
     country: {
         type: String,
     },
-    city: {
-        type: String,
-    },
     device:{
         type: String,
     },

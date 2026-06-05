@@ -108,8 +108,8 @@ export const analytics = async (req, res) => {
       const country = click.country || "Unknown";
       const city = click.city || "Unknown";
 
-      countryCounts[`${country}, ${city}`] =
-        (countryCounts[`${country}, ${city}`] || 0) + 1;
+      countryCounts[`${country}`] =
+        (countryCounts[`${country}`] || 0) + 1;
     });
 
     const topCountryEntry = Object.entries(countryCounts).sort(
