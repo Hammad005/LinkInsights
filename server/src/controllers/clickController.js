@@ -24,6 +24,7 @@ export const addNewClick = async (req, res) => {
         // Geo Location
         const geo = geoip.lookup(ip);
         
+        
 
         // Device Info
         const parser = new UAParser(req.headers['user-agent']);
@@ -35,6 +36,7 @@ export const addNewClick = async (req, res) => {
             linkId: link.shortCode,
             ipAddress: ip,
             country: geo?.country || "Unknown",
+            city: geo?.city || "Unknown",
             device: ua.device.type || "desktop",
             browser: ua.browser.name,
             referrer: req.headers.referer || "direct",
