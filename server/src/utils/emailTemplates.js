@@ -16,7 +16,7 @@ export const forgotPasswordOtpEmailTemplate = (otp, expiresIn) => `
           
           <!-- Header -->
           <tr>
-            <td style="background: #C2F4FD; padding:20px; text-align:center;">
+            <td style="background: #DFF9F8; padding:20px; text-align:center;">
               <img src="https://res.cloudinary.com/dmiamov7p/image/upload/v1780496975/linksight-logo_i8wppb.png" alt="LinkInsights Logo" style="max-width: 180px; height: auto;"/>
             </td>
           </tr>
