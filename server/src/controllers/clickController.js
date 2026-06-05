@@ -1,7 +1,7 @@
 import Link from '../models/Link.js';
 import Click from '../models/Click.js';
 import geoip from 'geoip-lite';
-import {UAParser} from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 
 export const addNewClick = async (req, res) => {
     try {
@@ -14,22 +14,34 @@ export const addNewClick = async (req, res) => {
             return res.status(410).json({ error: "Link has expired" });
         }
 
-        // Ip - Extract real client IP (handles proxy/load balancer scenarios)
-        const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
-                   req.headers['x-real-ip'] || 
-                   req.ip || 
-                   req.connection.remoteAddress;
-        
-        
+
+        // Get the client's IP address from the request
+        const getClientIP = (req) => {
+            return (req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+                req.headers['x-real-ip'] ||
+                req.headers['cf-connecting-ip'] ||  // Cloudflare
+                req.ip ||
+                req.socket.remoteAddress ||
+                req.connection.remoteAddress ||
+                'Unknown').trim();
+        };
+
+
         // Geo Location
         const geo = geoip.lookup(ip);
 
         // Location Info from IPapi (Fallback to geoiplite)
         const location = await fetch(`https://ipapi.co/${ip}/json/`)
-      .then((res) => res.json())
-      .catch(() => ({ city: "Unknown", country_name: "Unknown" }));
-        
-        
+            .then((res) => res.json())
+            .catch(() => ({ city: "Unknown", country_name: "Unknown" }));
+
+        // Add fallback with another service
+        if (location.city === 'Unknown') {
+            const backup = await fetch(`https://ip-api.com/json/${ip}`).then(r => r.json());
+            location.city = backup.city || 'Unknown';
+        }
+
+
 
         // Device Info
         const parser = new UAParser(req.headers['user-agent']);
