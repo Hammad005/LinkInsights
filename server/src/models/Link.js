@@ -23,6 +23,13 @@ const linkSchema = new mongoose.Schema({
     },
 }, {timestamps: true});
 
+// Index the expiresAt field to enable expiration of links
+// linkSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: 0 }
+// );
+
+
 const Link = mongoose.model("Link", linkSchema);
 
 export default Link;

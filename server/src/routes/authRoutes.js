@@ -1,5 +1,5 @@
 import express from 'express';
-import { ForgotPassword, Login, Logout, Me, ResendForgotPasswordOTP, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData, VerifiyForgotPasswordOTP } from '../controllers/authController.js';
+import { DeleteUser, ForgotPassword, Login, Logout, Me, ResendForgotPasswordOTP, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData, VerifiyForgotPasswordOTP } from '../controllers/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import multerUploadMiddleware from '../middleware/multerUploadMiddleware.js';
 
@@ -23,5 +23,7 @@ router.put('/updateProfilePic', authMiddleware, multerUploadMiddleware.single('p
 router.put('/updateUserData', authMiddleware, UpdateUserData);
 router.put('/resetPassword', authMiddleware, ResetPassword);
 
+// Delete Requests
+router.delete('/deleteUser', authMiddleware, DeleteUser);
 
 export default router;

@@ -6,6 +6,8 @@ import streamifier from "streamifier";
 import otpGenerator from "../func/otpGenerator.js";
 import sendEmail from "../lib/nodemailer.js";
 import { forgotPasswordOtpEmailTemplate } from "../utils/emailTemplates.js";
+import Click from "../models/Click.js";
+import Link from "../models/Link.js";
 
 export const Me = async (req, res) => {
   try {
@@ -219,7 +221,7 @@ export const ForgotPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-    user.forgotPasswordOTP= null;
+    user.forgotPasswordOTP = null;
     user.forgotPasswordOTPExpiry = null;
     user.forgotPasswordOTPVerified = false;
     await user.save();
@@ -338,5 +340,30 @@ export const ResetPassword = async (req, res) => {
     res
       .status(500)
       .json({ error: error.message || "Failed to reset password" });
+  }
+};
+
+export const DeleteUser = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const links = await Link.find({ createdBy: user._id });
+
+    const shortCodes = links.map((link) => link.shortCode);
+
+    await Click.deleteMany({
+      linkId: { $in: shortCodes },
+    });
+
+    await Link.deleteMany({
+      createdBy: user._id,
+    });
+
+    await User.findByIdAndDelete(user._id);
+
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: error.message || "Failed to delete user" });
   }
 };
