@@ -112,9 +112,12 @@ export const analytics = async (req, res) => {
         (countryCounts[`${country}, ${city}`] || 0) + 1;
     });
 
-    const topCountry = `The most visited country is ${Object.entries(countryCounts)
-      .sort((a, b) => b[1] - a[1])[0]
-      .join(", ")
+    const topCountryEntry = Object.entries(countryCounts).sort(
+      (a, b) => b[1] - a[1]
+    )[0];
+
+    const topCountry = `The most visited country is ${
+        topCountryEntry ? topCountryEntry[0] : "Unknown"
       }`;
 
     insights.push(topCountry);
@@ -124,17 +127,16 @@ export const analytics = async (req, res) => {
     const referrerCounts = {};
 
     allClicks.forEach((click) => {
-      const referrer =
-        click.referrer || "Direct";
-
-      referrerCounts[referrer] =
-        (referrerCounts[referrer] || 0) + 1;
+      const referrer = click.referrer || "Direct";
+      referrerCounts[referrer] = (referrerCounts[referrer] || 0) + 1;
     });
 
-    const topReferrer = `The most visited referrer is ${Object.entries(referrerCounts)
-      .sort((a, b) => b[1] - a[1])[0]
-      .join(", ")
-      }`;
+    const topReferrerEntry = Object.entries(referrerCounts).sort(
+      (a, b) => b[1] - a[1]
+    )[0];
+
+
+    const topReferrer = `The most visited referrer is ${topReferrerEntry ? topReferrerEntry[0] : "Direct"}`;
 
     insights.push(topReferrer);
 

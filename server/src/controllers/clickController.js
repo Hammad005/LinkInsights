@@ -23,6 +23,11 @@ export const addNewClick = async (req, res) => {
         
         // Geo Location
         const geo = geoip.lookup(ip);
+
+        // Location Info from IPapi (Fallback to geoiplite)
+        const location = await fetch(`https://ipapi.co/${ip}/json/`)
+      .then((res) => res.json())
+      .catch(() => ({ city: "Unknown", country_name: "Unknown" }));
         
         
 
@@ -35,8 +40,8 @@ export const addNewClick = async (req, res) => {
         await Click.create({
             linkId: link.shortCode,
             ipAddress: ip,
-            country: geo?.country || "Unknown",
-            city: geo?.city || "Unknown",
+            country: geo?.country || location.country_name,
+            city: geo?.city || location.city,
             device: ua.device.type || "desktop",
             browser: ua.browser.name,
             referrer: req.headers.referer || "direct",
