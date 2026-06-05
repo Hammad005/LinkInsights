@@ -16,7 +16,7 @@ export const addNewClick = async (req, res) => {
 
 
         // Get the client's IP address from the request
-        const getClientIP = (req) => {
+        const ip = (req) => {
             return (req.headers['x-forwarded-for']?.split(',')[0].trim() ||
                 req.headers['x-real-ip'] ||
                 req.headers['cf-connecting-ip'] ||  // Cloudflare
