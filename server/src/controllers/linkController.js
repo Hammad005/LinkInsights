@@ -25,7 +25,7 @@ export const createLink = async (req, res) => {
       createdBy: req.user._id,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       shortUrl: `${req.protocol}://${req.get("host")}${newLink.shortCode}`,
       link: newLink,
     });
@@ -41,12 +41,41 @@ export const analytics = async (req, res) => {
     const user = req.user;
 
     const Links = await Link.find({ createdBy: user._id }).sort({ createdAt: -1 });
+    if (Links.length === 0) {
+      return res.status(404).json({ error: "No Links found for this user" });
+    }
 
-    const linksWithClicks = Links.map((link) => ({
-      shortenedURL: `${req.protocol}://${req.get("host")}${link.shortCode}`,
-      originalURL: link.originalUrl,
-      totalClicks: link.clicks,
-    }));
+    const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    // Step 1: Group links by weekday
+    const grouped = Links.reduce((acc, link) => {
+      const day = new Date(link.createdAt).toLocaleDateString("en-US", {
+        weekday: "short",
+      });
+
+      if (!acc[day]) {
+        acc[day] = [];
+      }
+
+      acc[day].push(link);
+
+      return acc;
+    }, {});
+
+    // Step 2: Build full week response
+    const linksWithClicks = weekDays.map((day) => {
+      const dayLinks = grouped[day] || [];
+
+      return {
+        name: day,
+        totalClicks: dayLinks.reduce((sum, link) => sum + link.clicks, 0),
+        links: dayLinks.map((link) => ({
+          shortenedURL: `${req.protocol}://${req.get("host")}/${link.shortCode}`,
+          originalURL: link.originalUrl,
+          totalClicksOnThisLink: link.clicks,
+        })),
+      };
+    });
 
     const totalClicks = linksWithClicks.reduce((total, link) => {
       return total + link.totalClicks;
@@ -101,8 +130,7 @@ export const analytics = async (req, res) => {
       (a, b) => b[1] - a[1]
     )[0];
 
-    const topCountry = `The most visited country is ${
-        topCountryEntry ? topCountryEntry[0] : "Unknown"
+    const topCountry = `The most visited country is ${topCountryEntry ? topCountryEntry[0] : "Unknown"
       }`;
 
     insights.push(topCountry);
