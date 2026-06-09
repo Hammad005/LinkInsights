@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Search,
   Filter,
@@ -16,122 +16,206 @@ import {
   Printer,
   Download,
   MessageSquare,
-} from 'lucide-react';
+} from "lucide-react";
+
+import { useSearchParams } from "react-router-dom";
 
 export default function MyLinks() {
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showOrderModal, setShowOrderModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [dateRange, setDateRange] = useState('all');
-
-  // Mock orders data
-  const orders = [
+  // Mock link data
+  const links = [
     {
-      id: 'ORD-2024-1234',
+      id: "ORD-2024-1234",
       customer: {
-        name: 'John Smith',
-        email: 'john.smith@email.com',
-        phone: '+1 234 567 8900',
-        address: '123 Main St, New York, NY 10001',
+        name: "John Smith",
+        email: "john.smith@email.com",
+        phone: "+1 234 567 8900",
+        address: "123 Main St, New York, NY 10001",
       },
       items: [
-        { name: 'Wireless Bluetooth Headphones', quantity: 1, price: 49.99, image: '🎧' },
-        { name: 'USB-C Fast Charging Cable', quantity: 2, price: 14.99, image: '🔌' },
+        {
+          name: "Wireless Bluetooth Headphones",
+          quantity: 1,
+          price: 49.99,
+          image: "🎧",
+        },
+        {
+          name: "USB-C Fast Charging Cable",
+          quantity: 2,
+          price: 14.99,
+          image: "🔌",
+        },
       ],
       total: 79.97,
-      status: 'pending',
-      paymentStatus: 'paid',
-      date: '2024-01-15T10:30:00',
+      status: "pending",
+      paymentStatus: "paid",
+      date: "2024-01-15T10:30:00",
     },
     {
-      id: 'ORD-2024-1233',
+      id: "ORD-2024-1233",
       customer: {
-        name: 'Sarah Johnson',
-        email: 'sarah.j@email.com',
-        phone: '+1 345 678 9012',
-        address: '456 Oak Ave, Los Angeles, CA 90001',
+        name: "Sarah Johnson",
+        email: "sarah.j@email.com",
+        phone: "+1 345 678 9012",
+        address: "456 Oak Ave, Los Angeles, CA 90001",
       },
       items: [
-        { name: 'Smart Watch Pro', quantity: 1, price: 199.99, image: '⌚' },
+        { name: "Smart Watch Pro", quantity: 1, price: 199.99, image: "⌚" },
       ],
       total: 199.99,
-      status: 'processing',
-      paymentStatus: 'paid',
-      date: '2024-01-15T09:15:00',
+      status: "processing",
+      paymentStatus: "paid",
+      date: "2024-01-15T09:15:00",
     },
     {
-      id: 'ORD-2024-1232',
+      id: "ORD-2024-1232",
       customer: {
-        name: 'Mike Brown',
-        email: 'mike.b@email.com',
-        phone: '+1 456 789 0123',
-        address: '789 Pine Rd, Chicago, IL 60601',
+        name: "Mike Brown",
+        email: "mike.b@email.com",
+        phone: "+1 456 789 0123",
+        address: "789 Pine Rd, Chicago, IL 60601",
       },
       items: [
-        { name: 'Premium Phone Case', quantity: 3, price: 24.99, image: '📱' },
-        { name: 'Wireless Mouse', quantity: 1, price: 29.99, image: '🖱️' },
+        { name: "Premium Phone Case", quantity: 3, price: 24.99, image: "📱" },
+        { name: "Wireless Mouse", quantity: 1, price: 29.99, image: "🖱️" },
       ],
       total: 104.96,
-      status: 'shipped',
-      paymentStatus: 'paid',
-      trackingNumber: 'TRK123456789',
-      date: '2024-01-14T16:45:00',
+      status: "shipped",
+      paymentStatus: "paid",
+      trackingNumber: "TRK123456789",
+      date: "2024-01-14T16:45:00",
     },
     {
-      id: 'ORD-2024-1231',
+      id: "ORD-2024-1231",
       customer: {
-        name: 'Emily Davis',
-        email: 'emily.d@email.com',
-        phone: '+1 567 890 1234',
-        address: '321 Elm St, Houston, TX 77001',
+        name: "Emily Davis",
+        email: "emily.d@email.com",
+        phone: "+1 567 890 1234",
+        address: "321 Elm St, Houston, TX 77001",
       },
       items: [
-        { name: 'Mechanical Keyboard RGB', quantity: 1, price: 89.99, image: '⌨️' },
+        {
+          name: "Mechanical Keyboard RGB",
+          quantity: 1,
+          price: 89.99,
+          image: "⌨️",
+        },
       ],
       total: 89.99,
-      status: 'delivered',
-      paymentStatus: 'paid',
-      trackingNumber: 'TRK987654321',
-      date: '2024-01-13T11:20:00',
+      status: "delivered",
+      paymentStatus: "paid",
+      trackingNumber: "TRK987654321",
+      date: "2024-01-13T11:20:00",
     },
     {
-      id: 'ORD-2024-1230',
+      id: "ORD-2024-1230",
       customer: {
-        name: 'Chris Wilson',
-        email: 'chris.w@email.com',
-        phone: '+1 678 901 2345',
-        address: '654 Maple Dr, Phoenix, AZ 85001',
+        name: "Chris Wilson",
+        email: "chris.w@email.com",
+        phone: "+1 678 901 2345",
+        address: "654 Maple Dr, Phoenix, AZ 85001",
       },
       items: [
-        { name: 'Portable Power Bank 20000mAh', quantity: 2, price: 39.99, image: '🔋' },
+        {
+          name: "Portable Power Bank 20000mAh",
+          quantity: 2,
+          price: 39.99,
+          image: "🔋",
+        },
       ],
       total: 79.98,
-      status: 'cancelled',
-      paymentStatus: 'refunded',
-      cancelReason: 'Customer requested cancellation',
-      date: '2024-01-12T14:00:00',
+      status: "cancelled",
+      paymentStatus: "refunded",
+      cancelReason: "Customer requested cancellation",
+      date: "2024-01-12T14:00:00",
+    },
+    {
+      id: "ORD-2024-1530",
+      customer: {
+        name: "Chris Wilson",
+        email: "chris.w@email.com",
+        phone: "+1 678 901 2345",
+        address: "654 Maple Dr, Phoenix, AZ 85001",
+      },
+      items: [
+        {
+          name: "Portable Power Bank 20000mAh",
+          quantity: 2,
+          price: 39.99,
+          image: "🔋",
+        },
+      ],
+      total: 79.98,
+      status: "cancelled",
+      paymentStatus: "refunded",
+      cancelReason: "Customer requested cancellation",
+      date: "2024-01-12T14:00:00",
     },
   ];
 
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(links.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  const currentLinks = links.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page) => {
+  setSearchParams((prev) => {
+    const params = new URLSearchParams(prev);
+
+    if (page === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", page);
+    }
+
+    return params;
+  });
+};
+
+
+  
+
   const getStatusConfig = (status) => {
     const configs = {
-      pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100', label: 'Pending' },
-      processing: { icon: Package, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Processing' },
-      shipped: { icon: Truck, color: 'text-purple-600', bg: 'bg-purple-100', label: 'Shipped' },
-      delivered: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100', label: 'Delivered' },
-      cancelled: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100', label: 'Cancelled' },
+      pending: {
+        icon: Clock,
+        color: "text-yellow-600",
+        bg: "bg-yellow-100",
+        label: "Pending",
+      },
+      processing: {
+        icon: Package,
+        color: "text-blue-600",
+        bg: "bg-blue-100",
+        label: "Processing",
+      },
+      shipped: {
+        icon: Truck,
+        color: "text-purple-600",
+        bg: "bg-purple-100",
+        label: "Shipped",
+      },
+      delivered: {
+        icon: CheckCircle,
+        color: "text-green-600",
+        bg: "bg-green-100",
+        label: "Delivered",
+      },
+      cancelled: {
+        icon: XCircle,
+        color: "text-red-600",
+        bg: "bg-red-100",
+        label: "Cancelled",
+      },
     };
     return configs[status] || configs.pending;
   };
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || order.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  
 
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
@@ -140,12 +224,12 @@ export default function MyLinks() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -158,33 +242,56 @@ export default function MyLinks() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-[#dff9f881] rounded-2xl shadow-lg border border-white overflow-hidden ">
+      <div className="bg-transparent backdrop-blur-md rounded-2xl shadow-lg border border-white/30 overflow-hidden ">
         <div className="overflow-x-auto ">
           <table className="w-full ">
-            <thead className="bg-[#09c3f6d0] border-b border-white shadow">
+            <thead className="bg-[#09C1F6]/30 backdrop-blur-md border-b border-white shadow">
               <tr>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Order ID</th>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Customer</th>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Items</th>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Total</th>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Status</th>
-                <th className="text-left py-4 px-6 font-semibold text-white text-sm">Date</th>
-                <th className="text-right py-4 px-6 font-semibold text-white text-sm">Actions</th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Order ID
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Customer
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Items
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Total
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Status
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Date
+                </th>
+                <th className="text-right py-4 px-6 font-semibold text-[#052A5E] text-sm">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => {
+              {currentLinks.map((order) => {
                 const statusConfig = getStatusConfig(order.status);
                 const StatusIcon = statusConfig.icon;
                 return (
-                  <tr key={order.id} className="border-b border-white shadow hover:bg-gray-50">
+                  <tr
+                    key={order.id}
+                    className="border-b border-white shadow hover:bg-white/50"
+                  >
                     <td className="py-4 px-6">
-                      <span className="font-medium text-gray-800">{order.id}</span>
+                      <span className="font-medium text-gray-800">
+                        {order.id}
+                      </span>
                     </td>
                     <td className="py-4 px-6">
                       <div>
-                        <p className="font-medium text-gray-800">{order.customer.name}</p>
-                        <p className="text-sm text-gray-500">{order.customer.email}</p>
+                        <p className="font-medium text-gray-800">
+                          {order.customer.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {order.customer.email}
+                        </p>
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -200,12 +307,15 @@ export default function MyLinks() {
                           ))}
                         </div>
                         <span className="text-sm text-gray-600">
-                          {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                          {order.items.length} item
+                          {order.items.length > 1 ? "s" : ""}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="font-semibold text-gray-800">${order.total.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-800">
+                        ${order.total.toFixed(2)}
+                      </span>
                     </td>
                     <td className="py-4 px-6">
                       <span
@@ -215,7 +325,9 @@ export default function MyLinks() {
                         {statusConfig.label}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-gray-600 text-sm">{formatDate(order.date)}</td>
+                    <td className="py-4 px-6 text-gray-600 text-sm">
+                      {formatDate(order.date)}
+                    </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-end gap-2">
                         <button
@@ -234,29 +346,39 @@ export default function MyLinks() {
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-white shadow flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            Showing <span className="font-medium">1-{filteredOrders.length}</span> of{' '}
-            <span className="font-medium">{filteredOrders.length}</span> orders
+        <div className="px-6 py-4 bg-[#052A5E]/20 backdrop-blur-md border-t border-white shadow flex flex-wrap items-center sm:justify-between justify-center gap-3">
+          <p className="text-sm text-white">
+            Showing {startIndex + 1} - {startIndex + currentLinks.length} of {links.length} results
           </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+             className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
               Previous
             </button>
-            <button className="px-3 py-1.5 text-sm text-white bg-[#052A5E] rounded-lg hover:bg-red-700 transition-colors">
-              1
-            </button>
-            <button className="px-3 py-1.5 text-sm text-white bg-[#143461] rounded-lg hover:bg-red-700 transition-colors">
-              2
-            </button>
-            <button className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
+
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-3 py-1.5 text-sm hover:text-white  rounded-lg hover:bg-[#183763] transition-colors ${
+                  currentPage === index + 1 ? "bg-[#183763] text-white" : "bg-gray-300 text-black"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            
+            <button 
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
               Next
             </button>
           </div>
         </div>
       </div>
-
-     
 
       {/* Order Details Modal */}
       {showOrderModal && selectedOrder && (
@@ -264,7 +386,9 @@ export default function MyLinks() {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Order Details</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Order Details
+                </h2>
                 <p className="text-sm text-gray-500">{selectedOrder.id}</p>
               </div>
               <button
@@ -288,7 +412,9 @@ export default function MyLinks() {
                           <Icon className={`w-5 h-5 ${config.color}`} />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-800">{config.label}</p>
+                          <p className="font-semibold text-gray-800">
+                            {config.label}
+                          </p>
                           <p className="text-sm text-gray-500">Order status</p>
                         </div>
                       </>
@@ -306,7 +432,9 @@ export default function MyLinks() {
 
               {/* Customer Info */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Customer Information</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">
+                  Customer Information
+                </h3>
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -315,28 +443,38 @@ export default function MyLinks() {
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800">{selectedOrder.customer.name}</p>
+                      <p className="font-medium text-gray-800">
+                        {selectedOrder.customer.name}
+                      </p>
                       <p className="text-sm text-gray-500">Customer</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{selectedOrder.customer.email}</span>
+                    <span className="text-gray-600">
+                      {selectedOrder.customer.email}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{selectedOrder.customer.phone}</span>
+                    <span className="text-gray-600">
+                      {selectedOrder.customer.phone}
+                    </span>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
-                    <span className="text-gray-600">{selectedOrder.customer.address}</span>
+                    <span className="text-gray-600">
+                      {selectedOrder.customer.address}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Order Items */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Order Items</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">
+                  Order Items
+                </h3>
                 <div className="space-y-3">
                   {selectedOrder.items.map((item, idx) => (
                     <div
@@ -348,7 +486,9 @@ export default function MyLinks() {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-800">{item.name}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-sm text-gray-500">
+                          Qty: {item.quantity}
+                        </p>
                       </div>
                       <p className="font-semibold text-gray-800">
                         ${(item.price * item.quantity).toFixed(2)}
@@ -363,7 +503,9 @@ export default function MyLinks() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="text-gray-800">${selectedOrder.total.toFixed(2)}</span>
+                    <span className="text-gray-800">
+                      ${selectedOrder.total.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Shipping</span>
@@ -376,7 +518,9 @@ export default function MyLinks() {
                   <div className="border-t border-gray-200 pt-2 mt-2">
                     <div className="flex justify-between">
                       <span className="font-semibold text-gray-800">Total</span>
-                      <span className="font-bold text-gray-800">${selectedOrder.total.toFixed(2)}</span>
+                      <span className="font-bold text-gray-800">
+                        ${selectedOrder.total.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -388,8 +532,12 @@ export default function MyLinks() {
                   <div className="flex items-center gap-3">
                     <Truck className="w-5 h-5 text-purple-600" />
                     <div>
-                      <p className="font-medium text-purple-800">Tracking Number</p>
-                      <p className="text-sm text-purple-600">{selectedOrder.trackingNumber}</p>
+                      <p className="font-medium text-purple-800">
+                        Tracking Number
+                      </p>
+                      <p className="text-sm text-purple-600">
+                        {selectedOrder.trackingNumber}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -420,7 +568,6 @@ export default function MyLinks() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

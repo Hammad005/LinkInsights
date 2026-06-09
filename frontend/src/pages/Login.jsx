@@ -38,19 +38,19 @@ export default function Login({ onLogin }) {
     <div
       className="relative min-h-screen flex items-center justify-center p-4"
       style={{
-        backgroundImage: "url('/login-bg.jpg')",
+        backgroundImage: "url('/dashboardBg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
     >
       {/* Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60 z-0" />
+      {/* <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60 z-0" /> */}
 
       <div className="w-full max-w-md z-10">
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-transparent backdrop-blur-md rounded-2xl shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 p-8">
           {/* Logo */}
           <img
             src="/LinkInsights.svg"
@@ -212,11 +212,8 @@ export default function Login({ onLogin }) {
 
           {/* Divider */}
           <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+              <span className="bg-transparent backdrop-blur-md px-2 text-gray-500">
                 or continue with
               </span>
             </div>

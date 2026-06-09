@@ -14,6 +14,7 @@ import {
   MousePointerClick,
   ChartNoAxesCombined,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   AreaChart,
   Area,
@@ -27,6 +28,8 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   // Mock data
   const stats = [
     {
@@ -78,16 +81,16 @@ export default function Dashboard() {
           return (
             <div
               key={index}
-              className="bg-[#dff9f881] rounded-2xl p-6 shadow-sm border border-white hover:shadow-md transition-shadow"
+              className="bg-[#09C1F6]/5 backdrop-blur-md rounded-2xl p-6 shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.2)] border border-white/20  hover:-translate-y-2 transition-all duration-300 ease-in-out"
             >
-              <div className="flex items-start justify-between">
-                <div className={`p-3 rounded-xl bg-[#052A5E] border-2 border-[#09C1F6]`}>
-                  <Icon className={`w-6 h-6 text-[#09C1F6]`} />
+              <div className="flex flex-col items-center justify-center">
+                <div className={`p-3 rounded-xl bg-[#052a5e] border-2 border-[#09C1F6]`}>
+                  <Icon className={`w-10 h-10 text-[#09C1F6]`} />
                 </div>
                 
-              <div className="flex flex-col">
-                <p className="text-2xl font-bold text-[#052A5E]">{stat.value}</p>
-                <p className="text-sm text-[#052A5E]/80 mt-1">{stat.title}</p>
+              <div className="flex flex-col items-center justify-center text-center">
+                <p className="text-6xl font-bold text-[#052A5E]">{stat.value}</p>
+                <p className="text-lg text-[#052A5E]/80 mt-1">{stat.title}</p>
               </div>
               </div>
             </div>
@@ -96,7 +99,7 @@ export default function Dashboard() {
       </div>
 
       {/* Revenue Chart */}
-      <div className=" bg-[#dff9f881] rounded-2xl p-6 shadow-sm border border-white">
+      <div className="rounded-2xl p-6 bg-transparent backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.2)] border border-white/20">
           <div className="flex flex-col mb-6">
             <h2 className="text-lg font-semibold text-[#052A5E]">Clicks Overview</h2>
             <p className="text-sm text-[#052A5E]/80">Last 7 days</p>
@@ -146,24 +149,26 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Insights */}
-        <div className="bg-[#dff9f881] rounded-2xl p-6 shadow-sm border border-white">
+        <div className="rounded-2xl p-6 bg-[#09C1F6]/10 backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.2)] border border-white/20">
           <h2 className="mb-2 text-lg font-semibold text-[#052A5E]">Insights</h2>
             {insights.map((product, index) => (
-              <p key={index} className="text-sm font-medium text-gray-800 truncate">{product}</p>
+              <p key={index} className="text-sm font-medium text-gray-800 truncate bg-white my-2 px-2 w-fit">{product}</p>
 
             ))}
           
         </div>
 
         {/* Quick Actions */}
-        <div className="lg:col-span-2 bg-gradient-to-r from-[#052a5e] to-[#09c3f652] rounded-2xl p-6 text-white flex">
+        <div className="lg:col-span-2 bg-gradient-to-r from-[#052a5e] to-[#09c3f652] rounded-2xl p-6 text-white flex backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.5)] border border-white/20">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
             <div>
               <h3 className="text-xl font-bold">Ready to get started?</h3>
               <p className="text-white/80 mt-1">Generate a unique link to share with your customers & analyze clicks.</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="px-4 py-2.5 bg-white border border-white/20 rounded-xl font-semibold hover:bg-white/20 text-[#052A5E] hover:text-white transition-colors">
+              <button 
+              onClick={() => navigate("/generate-link")}
+              className="px-4 py-2.5 bg-white border border-white/20 rounded-xl font-semibold hover:bg-white/20 text-[#052A5E] hover:text-white transition-colors">
                 Generate New Link
               </button>
             </div>

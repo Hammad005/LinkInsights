@@ -9,18 +9,15 @@ import {
   HelpCircle,
   MessageSquare,
   Link,
+  PlusCircle,
 } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
 
-export default function Sidebar({
-  activeTab,
-  onTabChange,
-  isMobileOpen,
-  onMobileClose,
-  vendor,
-}) {
+export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "myLinks", label: "My Links", icon: Link },
+    { id: "generate-link", label: "Generate Link", icon: PlusCircle },
+    { id: "links", label: "My Links", icon: Link },
     { id: "products", label: "My Products", icon: Package },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "messages", label: "Messages", icon: MessageSquare, badge: 3 },
@@ -28,8 +25,9 @@ export default function Sidebar({
     { id: "settings", label: "Store Settings", icon: Settings },
   ];
 
-  const handleTabChange = (tab) => {
-    onTabChange(tab);
+  const pathname = useLocation().pathname;
+
+  const handleTabChange = () => {
     onMobileClose();
   };
 
@@ -38,7 +36,7 @@ export default function Sidebar({
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={onMobileClose}
         />
       )}
@@ -47,15 +45,14 @@ export default function Sidebar({
       <aside
         className={`
         fixed lg:sticky top-0 left-0 z-50
-        w-72 bg-[#dff9f881] border-r border-gray-200 h-screen flex flex-col flex-shrink-0
-        transform transition-transform duration-300 ease-in-out
+        w-72 lg:m-5 lg:rounded-2xl lg:bg-[#09C1F6]/10 bg-white/50 backdrop-blur-md lg:border border-r border-white/30  flex flex-col flex-shrink-0
+        transform transition-transform duration-300 ease-in-out lg:h-auto h-screen
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         {/* Store Header */}
-        <div className="p-4  bg-[#dff9f881]">
+        <div className="p-4  bg-transparent">
           <div className="flex items-center justify-between">
-            
             <img
               src="/LinkInsights.svg"
               alt="LinkInsights Logo"
@@ -68,38 +65,31 @@ export default function Sidebar({
               <X size={20} className="text-[#052A5E]" />
             </button>
           </div>
-
         </div>
-
-        {/* Store Status */}
-        {/* <div className="p-4 border-b border-gray-100">
-          <div className="bg-green-50 rounded-xl p-3 flex items-center gap-3">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <div>
-              <p className="text-sm font-medium text-green-800">Store Active</p>
-              <p className="text-xs text-green-600">Your products are live</p>
-            </div>
-          </div>
-        </div> */}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
             Main Menu
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive =
+                pathname === "/"
+                  ? item.id === "dashboard"
+                  : pathname.startsWith(`/${item.id}`);
 
               return (
                 <li key={item.id}>
-                  <button
+                  <NavLink
+                    to={item.id === "dashboard" ? "/" : `/${item.id}`}
                     onClick={() => handleTabChange(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
-                      ? "bg-[#09C1F6] text-white font-semibold shadow-sm"
-                      : "text-[#052A5E] hover:bg-white"
-                      }`}
+                    className={`w-full text-[#052A5E] flex items-center gap-3 px-4 py-3 rounded-xl transition-all border ${
+                      isActive
+                        ? "text-white bg-[#09C1F6]/30 backdrop-blur-md  font-semibold shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_-2px_-4px_10px_0_rgba(0,0,0,0.25)] border-white/20"
+                        : "bg-transparent hover:text-white hover:bg-[#09C1F6]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)] border-transparent"
+                    }`}
                   >
                     <Icon size={20} />
                     <span>{item.label}</span>
@@ -108,26 +98,19 @@ export default function Sidebar({
                         {item.badge}
                       </span>
                     )}
-                  </button>
+                  </NavLink>
                 </li>
               );
             })}
           </ul>
-
-          {/* <div className="mt-6">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-              Support
-            </p>
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-              <HelpCircle size={20} />
-              <span>Help Center</span>
-            </button>
-          </div> */}
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-gray-200">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#052A5E] hover:bg-white transition-all cursor-pointer">
+        <div className="p-4 border-t border-white/30">
+          <button
+            onClick={() => handleLogout()}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer  text-white lg:bg-transparent bg-[#09C1F6]/30 backdrop-blur-md  font-semibold hover:shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_-2px_-4px_8px_0_rgba(0,0,0,0.25)] border-white/20"
+          >
             <LogOut size={20} />
             <span>Logout</span>
           </button>
