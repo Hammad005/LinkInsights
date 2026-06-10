@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store } from "lucide-react";
+import gsap from "gsap";
 
 export default function Login({ onLogin }) {
+  const cardRef = useRef(null);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
@@ -34,6 +36,26 @@ export default function Login({ onLogin }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  useEffect(() => {
+  gsap.fromTo(
+    cardRef.current,
+    {
+      opacity: 0,
+      y: 100,
+      scale: 0.9,
+      rotateX: 15,
+    },
+    {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      duration: 1,
+      ease: "power4.out",
+    }
+  );
+}, []);
+
   return (
     <div
       className="relative min-h-screen flex items-center justify-center p-4"
@@ -50,7 +72,9 @@ export default function Login({ onLogin }) {
       <div className="w-full max-w-md z-10">
 
         {/* Card */}
-        <div className="bg-transparent backdrop-blur-md rounded-2xl shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 p-8">
+        <div 
+        ref={cardRef}
+        className="bg-transparent backdrop-blur-md rounded-2xl shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 p-8">
           {/* Logo */}
           <img
             src="/LinkInsights.svg"

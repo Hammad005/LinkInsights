@@ -13,6 +13,9 @@ import './App.css';
 import MyLinks from './pages/MyLinks';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AddLink from './pages/AddLink';
+import Click from './pages/Click';
+import ClickInner from './pages/ClickInner';
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -36,10 +39,31 @@ function App() {
   // If not authenticated, show login page
   if (!isAuthenticated) {
    return (
+    <>
+    <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#0f1e5a",
+                color: "#ffffff",
+                border: "1px solid #1674bb",
+                boxShadow: "0 12px 30px rgba(22, 116, 187, 0.25)",
+                fontSize: "0.9rem",
+              },
+              success: {
+                iconTheme: { primary: "#40bfff", secondary: "#0f1e5a" },
+              },
+              error: {
+                iconTheme: { primary: "#ef4444", secondary: "#0f1e5a" },
+              },
+            }}
+          />
       <Routes>
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+    </>
     );
   }
 
@@ -65,11 +89,34 @@ function App() {
           vendor={vendor}
           handleLogout={handleLogout}
         />
-        <main className="flex-1 p-4  overflow-y-auto pt-25">
+        <main className="flex-1 p-4  overflow-y-auto pt-25"
+        
+        >
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#0f1e5a",
+                color: "#ffffff",
+                border: "1px solid #1674bb",
+                boxShadow: "0 12px 30px rgba(22, 116, 187, 0.25)",
+                fontSize: "0.9rem",
+              },
+              success: {
+                iconTheme: { primary: "#40bfff", secondary: "#0f1e5a" },
+              },
+              error: {
+                iconTheme: { primary: "#ef4444", secondary: "#0f1e5a" },
+              },
+            }}
+          />
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/generate-link" element={<AddLink />} />
             <Route path="/links" element={<MyLinks />} />
+            <Route path="/clicks" element={<Click />} />
+            <Route path="/clicks/:code" element={<ClickInner />} />
             <Route path="/products" element={<Products />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/messages" element={<Messages />} />

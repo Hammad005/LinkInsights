@@ -1,12 +1,34 @@
+import gsap from 'gsap';
 import { Menu, Bell, Search, ChevronDown, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Header({ onMenuToggle, vendor, handleLogout }) {
+  const headerRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
+
+  useEffect(() => {
+  if (window.innerWidth >= 1024) {
+    gsap.fromTo(
+      headerRef.current,
+      {
+        opacity: 0,
+        y: "-100%",
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 2,
+        ease: "power4.out",
+      }
+    );
+  }
+}, []);
 
   return (
     <div className="relative lg:my-5 lg:me-5">
-    <header className="bg-[#09C1F6]/10 backdrop-blur-md px-4 md:px-6 py-4 absolute top-0 z-30 w-full lg:rounded-2xl">
+    <header 
+    ref={headerRef}
+    className="bg-[#09C1F6]/10 backdrop-blur-md px-4 md:px-6 py-4 absolute top-0 z-30 w-full lg:rounded-2xl">
       <div className="flex items-center justify-between gap-4">
         {/* Left Section */}
         <div className="flex items-center gap-4">

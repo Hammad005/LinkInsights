@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store, Link2, AtSign, CalendarClock } from "lucide-react";
+import gsap from "gsap";
 
 export default function AddLink() {
+    const cardRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
@@ -11,37 +13,37 @@ export default function AddLink() {
     });
 
     const errorValidation = () => {
-    const newErrors = {};
+        const newErrors = {};
 
-    let url = formData.originalUrl.trim();
+        let url = formData.originalUrl.trim();
 
-    if (!url) {
-        newErrors.originalUrl = "Original URL is required";
-    } else {
-        // add protocol if missing
-        if (!/^https?:\/\//i.test(url)) {
-            url = "https://" + url;
-        }
-
-        // simple format check (fast fail)
-        const simpleUrlPattern =
-            /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$/i;
-
-        if (!simpleUrlPattern.test(url)) {
-            newErrors.originalUrl = "Invalid URL format";
+        if (!url) {
+            newErrors.originalUrl = "Original URL is required";
         } else {
-            try {
-                new URL(url);
-            } catch {
+            // add protocol if missing
+            if (!/^https?:\/\//i.test(url)) {
+                url = "https://" + url;
+            }
+
+            // simple format check (fast fail)
+            const simpleUrlPattern =
+                /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$/i;
+
+            if (!simpleUrlPattern.test(url)) {
                 newErrors.originalUrl = "Invalid URL format";
+            } else {
+                try {
+                    new URL(url);
+                } catch {
+                    newErrors.originalUrl = "Invalid URL format";
+                }
             }
         }
-    }
 
-    setErrors(newErrors);
+        setErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0;
-};
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -73,6 +75,27 @@ export default function AddLink() {
         }, 1000);
     };
 
+
+    useEffect(() => {
+        gsap.fromTo(
+            cardRef.current,
+            {
+                opacity: 0,
+                y: 100,
+                scale: 0.9,
+                rotateX: 15,
+            },
+            {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotateX: 0,
+                duration: 1,
+                ease: "power4.out",
+            }
+        );
+    }, []);
+
     return (
         <div
             className="flex items-center justify-center h-full pb-25"
@@ -80,7 +103,9 @@ export default function AddLink() {
             <div className="w-full max-w-md ">
 
                 {/* Card */}
-                <div className="bg-transparent backdrop-blur-md rounded-2xl shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 p-8">
+                <div
+                    ref={cardRef}
+                    className="bg-transparent backdrop-blur-md rounded-2xl shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 p-8">
                     {/* Logo */}
                     <img
                         src="/LinkInsights.svg"
@@ -167,6 +192,11 @@ export default function AddLink() {
                         </button>
                     </form>
                 </div>
+                <p className="text-center text-[#052A5E] text-sm mt-6 font-semibold">
+                    <span className="font-normal text-xs">Your generated link should look like this:</span>
+                    <br />
+                    {import.meta.env.VITE_BASE_URL}{formData.customAlias || "custom-alias"}
+                </p>
             </div>
 
         </div>

@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import {
   LayoutDashboard,
   Package,
@@ -10,14 +11,37 @@ import {
   MessageSquare,
   Link,
   PlusCircle,
+  MousePointerClick,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+  if (window.innerWidth >= 1024) {
+    gsap.fromTo(
+      sidebarRef.current,
+      {
+        opacity: 0,
+        x: "-100%",
+      },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 2,
+        ease: "power4.out",
+      }
+    );
+  }
+}, []);
+
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "generate-link", label: "Generate Link", icon: PlusCircle },
     { id: "links", label: "My Links", icon: Link },
+    { id: "clicks", label: "Clicks", icon: MousePointerClick },
     { id: "products", label: "My Products", icon: Package },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "messages", label: "Messages", icon: MessageSquare, badge: 3 },
@@ -43,10 +67,10 @@ export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
         className={`
         fixed lg:sticky top-0 left-0 z-50
-        w-72 lg:m-5 lg:rounded-2xl lg:bg-[#09C1F6]/10 bg-white/50 backdrop-blur-md lg:border border-r border-white/30  flex flex-col flex-shrink-0
-        transform transition-transform duration-300 ease-in-out lg:h-auto h-screen
+        w-72 lg:m-5 lg:rounded-2xl lg:bg-[#09C1F6]/10 bg-white/50 backdrop-blur-md lg:border border-r border-white  flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out lg:transition-none lg:h-auto h-screen
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
@@ -106,7 +130,7 @@ export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-white/30">
+        <div className="p-4 border-t border-white">
           <button
             onClick={() => handleLogout()}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer  text-white lg:bg-transparent bg-[#09C1F6]/30 backdrop-blur-md  font-semibold hover:shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_-2px_-4px_8px_0_rgba(0,0,0,0.25)] border-white/20"
