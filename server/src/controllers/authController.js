@@ -283,20 +283,16 @@ export const UpdateProfilePic = async (req, res) => {
 
 export const UpdateUserData = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, phone } = req.body;
     const user = req.user;
     user.name = name || user.name;
     user.email = email || user.email;
+    user.phone = phone || user.phone;
     await user.save();
     return res
       .status(200)
       .json({
-        message:
-          name && email
-            ? "Name and email updated successfully"
-            : name
-              ? "Name updated successfully"
-              : "Email updated successfully",
+        message: "Profile updated successfully",
         userData: { name: user.name, email: user.email },
       });
   } catch (error) {

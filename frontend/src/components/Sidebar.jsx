@@ -42,11 +42,7 @@ export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
     { id: "generate-link", label: "Generate Link", icon: PlusCircle },
     { id: "links", label: "My Links", icon: Link },
     { id: "clicks", label: "Clicks", icon: MousePointerClick },
-    { id: "products", label: "My Products", icon: Package },
-    { id: "orders", label: "Orders", icon: ShoppingCart },
-    { id: "messages", label: "Messages", icon: MessageSquare, badge: 3 },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "settings", label: "Store Settings", icon: Settings },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   const pathname = useLocation().pathname;

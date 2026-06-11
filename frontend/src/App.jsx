@@ -4,10 +4,6 @@ import Header from './components/Header';
 import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Products from './pages/Products';
-import Orders from './pages/Orders';
-import Messages from './pages/Messages';
-import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import './App.css';
 import MyLinks from './pages/MyLinks';
@@ -117,12 +113,7 @@ function App() {
             <Route path="/links" element={<MyLinks />} />
             <Route path="/clicks" element={<Click />} />
             <Route path="/clicks/:code" element={<ClickInner />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
-
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

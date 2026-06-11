@@ -1,8 +1,10 @@
 import gsap from 'gsap';
 import { Menu, Bell, Search, ChevronDown, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header({ onMenuToggle, vendor, handleLogout }) {
+  const navigate = useNavigate();
   const headerRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
 
@@ -25,7 +27,8 @@ export default function Header({ onMenuToggle, vendor, handleLogout }) {
 }, []);
 
   return (
-    <div className="relative lg:my-5 lg:me-5">
+    <div
+     className="relative lg:my-5 lg:me-5">
     <header 
     ref={headerRef}
     className="bg-[#09C1F6]/10 backdrop-blur-md px-4 md:px-6 py-4 absolute top-0 z-30 w-full lg:rounded-2xl">
@@ -67,7 +70,12 @@ export default function Header({ onMenuToggle, vendor, handleLogout }) {
                   <p className="text-sm text-gray-500">{vendor?.email || 'vendor@example.com'}</p>
                 </div>
                 <div className="p-2">
-                  <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl">
+                  <button 
+                  onClick={() => {
+                    navigate('/settings')
+                    setShowProfile(false)
+                  }}
+                  className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl">
                     View Profile
                   </button>
                   <button 
