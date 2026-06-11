@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store } from "lucide-react";
 import gsap from "gsap";
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const cardRef = useRef(null);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
+
+
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -23,7 +25,7 @@ export default function Login({ onLogin }) {
     setTimeout(() => {
       setIsLoading(false);
       if (isLogin) {
-        onLogin();
+        // Login success
       } else {
         // Registration success - switch to login
         setIsLogin(true);
@@ -221,7 +223,7 @@ export default function Login({ onLogin }) {
             <button
               type="submit"
               disabled={isLoading}
-              className="cursor-pointer w-full bg-gradient-to-r from-[#052A5E] to-[#09C1F6] text-white py-3 rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="cursor-pointer w-full bg-linear-to-r from-[#052A5E] to-[#09C1F6] text-white py-3 rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors duration-500 ease-in-out flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

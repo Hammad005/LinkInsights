@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import ScrollToTop from './components/ScrollToTop';
@@ -12,25 +12,43 @@ import AddLink from './pages/AddLink';
 import Click from './pages/Click';
 import ClickInner from './pages/ClickInner';
 import { Toaster } from "react-hot-toast";
+import { useSelector, useDispatch } from 'react-redux';
+import { getMe } from './features/auth/authThunks';
+import { Loader2 } from 'lucide-react';
+
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, isCheckingAuth } = useSelector((state) => state.auth);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const disptach = useDispatch();
 
-  // Mock vendor data
-  const vendor = {
-    storeName: 'FLM Vendor',
-    ownerName: 'John Doe',
-    email: 'john.doe@email.com',
-  };
+  useEffect(() => {
+    disptach(getMe());
+  }, [])
+  
+if (isCheckingAuth) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-2"
+      style={{
+        backgroundImage: "url('/dashboardBg.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+      >
+        <img
+        src="/LinkInsights.svg"
+        alt="LinkInsights"
+        draggable={false}
+        fetchPriority="high"
+        className="w-46 h-auto"
+      />
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-  };
+      <Loader2 className="animate-spin size-10 text-[#052A5E] animate-pulse" />
+      </div>
+      
+    );
+  }
 
   // If not authenticated, show login page
   if (!isAuthenticated) {
@@ -56,7 +74,7 @@ function App() {
             }}
           />
       <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/login" element={<Login />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </>
@@ -77,13 +95,11 @@ function App() {
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
-        handleLogout={handleLogout}
       />
       <div className="flex-1 flex flex-col h-screen overflow-hidden lg:ml-0">
         <Header 
           onMenuToggle={() => setIsMobileSidebarOpen(true)} 
-          vendor={vendor}
-          handleLogout={handleLogout}
+
         />
         <main className="flex-1 p-4  overflow-y-auto pt-25"
         
