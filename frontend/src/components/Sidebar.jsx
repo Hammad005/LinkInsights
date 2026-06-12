@@ -12,30 +12,35 @@ import {
   Link,
   PlusCircle,
   MousePointerClick,
+  Loader2,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
+import { logout } from "../features/auth/authThunks";
 
-export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
+export default function Sidebar({ isMobileOpen, onMobileClose }) {
   const sidebarRef = useRef(null);
+  const { isLoggingOut } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-  if (window.innerWidth >= 1024) {
-    gsap.fromTo(
-      sidebarRef.current,
-      {
-        opacity: 0,
-        x: "-100%",
-      },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 2,
-        ease: "power4.out",
-      }
-    );
-  }
-}, []);
+    if (window.innerWidth >= 1024) {
+      gsap.fromTo(
+        sidebarRef.current,
+        {
+          opacity: 0,
+          x: "-100%",
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 2,
+          ease: "power4.out",
+        },
+      );
+    }
+  }, []);
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -128,11 +133,22 @@ export default function Sidebar({ isMobileOpen, onMobileClose, handleLogout }) {
         {/* Logout */}
         <div className="p-4 border-t border-white">
           <button
-            onClick={() => handleLogout()}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer  text-white lg:bg-transparent bg-[#09C1F6]/30 backdrop-blur-md  font-semibold hover:shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_-2px_-4px_8px_0_rgba(0,0,0,0.25)] border-white/20"
+            type="button"
+            disabled={isLoggingOut}
+            onClick={() => dispatch(logout())}
+            className="disabled:opacity-50 w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer  text-white lg:bg-transparent bg-[#09C1F6]/30 backdrop-blur-md  font-semibold hover:shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_-2px_-4px_8px_0_rgba(0,0,0,0.25)] border-white/20"
           >
-            <LogOut size={20} />
-            <span>Logout</span>
+            {isLoggingOut ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                Logging out...
+              </>
+            ) : (
+              <>
+                <LogOut size={20} />
+                <span>Logout</span>
+              </>
+            )}
           </button>
         </div>
       </aside>

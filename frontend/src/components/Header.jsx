@@ -1,12 +1,16 @@
 import gsap from 'gsap';
 import { Menu, Bell, Search, ChevronDown, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../features/auth/authThunks';
 
-export default function Header({ onMenuToggle, vendor, handleLogout }) {
+export default function Header({ onMenuToggle }) {
   const navigate = useNavigate();
   const headerRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
+  const { user, isLoggingOut } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   useEffect(() => {
   if (window.innerWidth >= 1024) {
@@ -57,7 +61,7 @@ export default function Header({ onMenuToggle, vendor, handleLogout }) {
                 <User size={18} className="text-white" />
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-gray-800">{vendor?.ownerName || 'John Doe'}</p>
+                <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
               </div>
               <ChevronDown size={16} className="text-gray-400 hidden md:block" />
             </button>
@@ -66,8 +70,8 @@ export default function Header({ onMenuToggle, vendor, handleLogout }) {
             {showProfile && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 <div className="p-4 border-b border-gray-100">
-                  <p className="font-semibold text-gray-800">{vendor?.ownerName || 'John Doe'}</p>
-                  <p className="text-sm text-gray-500">{vendor?.email || 'vendor@example.com'}</p>
+                  <p className="font-semibold text-gray-800">{user?.name}</p>
+                  <p className="text-sm text-gray-500">{user?.email}</p>
                 </div>
                 <div className="p-2">
                   <button 
@@ -75,13 +79,14 @@ export default function Header({ onMenuToggle, vendor, handleLogout }) {
                     navigate('/settings')
                     setShowProfile(false)
                   }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl">
+                  className="cursor-pointer w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl">
                     View Profile
                   </button>
                   <button 
-                  onClick={() => handleLogout()}
-                  className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 rounded-xl">
-                    Logout
+                  disabled={isLoggingOut}
+                  onClick={() => dispatch(logout())}
+                  className="cursor-pointer w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 disabled:bg-gray-200 disabled:text-gray-500 rounded-xl">
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
                   </button>
                 </div>
               </div>

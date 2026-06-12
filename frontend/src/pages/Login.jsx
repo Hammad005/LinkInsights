@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store } from "lucide-react";
 import gsap from "gsap";
+import { useDispatch, useSelector } from "react-redux";
+import { login, signup } from "../features/auth/authThunks";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const cardRef = useRef(null);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
-
-
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -17,21 +17,38 @@ export default function Login() {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e) => {
+  const {isLoggingIn, isSigningUp} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+
+    const logindata = {
+      email: formData.email,
+      password: formData.password,
+    }
+
+    const signupdata = {
+      name: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+    }
 
     // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      if (isLogin) {
-        // Login success
-      } else {
-        // Registration success - switch to login
-        setIsLogin(true);
-        setFormData({ ...formData, password: "", confirmPassword: "" });
+    if (isLogin) {
+      // Login success
+      await dispatch(login(logindata)).unwrap();
+      setFormData({ ...formData, password: "" });
+    } else {
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
       }
-    }, 1000);
+      // Registration success - switch to login
+      await dispatch(signup(signupdata)).unwrap();
+      setFormData({ ...formData, password: "", confirmPassword: "" });
+    }
   };
 
   const handleChange = (e) => {
@@ -138,6 +155,7 @@ export default function Login() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    required
                     placeholder="admin@example.com"
                     className="w-full pl-10 pr-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none "
                   />
@@ -157,6 +175,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
+                  required
                   onChange={handleChange}
                   placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none "
@@ -222,10 +241,10 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoggingIn || isSigningUp}
               className="cursor-pointer w-full bg-linear-to-r from-[#052A5E] to-[#09C1F6] text-white py-3 rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors duration-500 ease-in-out flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {isLoading ? (
+              {isLoggingIn || isSigningUp ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>

@@ -21,7 +21,7 @@ export const signup = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
         const res = await registerUser(data);
-        localStorage.setItem('Bearer-Token', res.data.token);
+        localStorage.setItem('Bearer-Token', res.data.accessToken);
         toast.success('Signup successful');
         return res.data;
     } catch (error) {
@@ -36,7 +36,7 @@ export const login = createAsyncThunk(
     async (data, thunkAPI) => {
         try {
             const res = await loginUser(data);
-            localStorage.setItem('Bearer-Token', res.data.token);
+            localStorage.setItem('Bearer-Token', res.data.accessToken);
             toast.success('Login successful');
             return res.data;
         } catch (error) {
