@@ -98,7 +98,7 @@ export default function AddLink() {
 
     return (
         <div
-            className="flex items-center justify-center h-full pb-25"
+            className="flex items-center justify-center min-h-screen h-full pb-25"
         >
             <div className="w-full max-w-md ">
 
@@ -195,7 +195,7 @@ export default function AddLink() {
                 <p className="text-center text-[#052A5E] text-sm mt-6 font-semibold">
                     <span className="font-normal text-xs">Your generated link should look like this:</span>
                     <br />
-                    {import.meta.env.VITE_BASE_URL}{formData.customAlias || "custom-alias"}
+                    {import.meta.env.VITE_BASE_URL}/{formData.customAlias || "custom-alias"}
                 </p>
             </div>
 

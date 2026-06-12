@@ -77,14 +77,15 @@ export default function Login() {
 
   return (
     <div
-      className="relative min-h-screen flex items-center justify-center p-4"
       style={{
         backgroundImage: "url('/dashboardBg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
       }}
     >
+      <div className="relative min-h-screen flex items-center justify-center p-4">
       {/* Overlay */}
       {/* <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60 z-0" /> */}
 
@@ -291,6 +292,7 @@ export default function Login() {
         <p className="text-center text-white text-sm mt-6">
           © {new Date().getFullYear()} LinkInsights. All rights reserved.
         </p>
+      </div>
       </div>
     </div>
   );

@@ -22,14 +22,15 @@ import {
   Eye,
 } from 'lucide-react';
 import gsap from 'gsap';
+import { useSelector } from 'react-redux';
 
 export default function Settings() {
   const [activeSection, setActiveSection] = useState('Profile');
+  const {user} = useSelector((state) => state.auth);
   const [ownerSettings, setOwnerSettings] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@email.com',
-    phone: '+1 234 567 8901',
+    firstName: user?.name,
+    email: user?.email,
+    phone: user?.phone || '',
   });
   const [passwordSettings, setPasswordSettings] = useState({
     currentPassword: '',
@@ -106,7 +107,11 @@ export default function Settings() {
 
             <div className="flex items-center gap-6">
               <div className="bg-linear-to-r from-[#052A5E] to-[#09C1F6] w-24 h-24 bg-red-100 rounded-2xl flex items-center justify-center">
-                <User className="w-10 h-10 text-white" />
+                {user?.profileImage?.profileUrl ? (
+                  <img src={user.profileImage.profileUrl} alt={user.name} className="w-full h-full object-cover rounded-2xl" />
+                ) : (
+                  <User className="w-10 h-10 text-white" />
+                )}
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700">Profile Photo</h3>
@@ -117,39 +122,21 @@ export default function Settings() {
                 </button>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name
-                </label>
-                <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
-                  <input
-                    type="text"
-                    required
-                    value={ownerSettings.firstName}
-                    onChange={(e) => setOwnerSettings({ ...ownerSettings, firstName: e.target.value })}
-                    placeholder="Full Name"
-                    className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name
+                  </label>
+                  <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
+                    <input
+                      type="text"
+                      required
+                      value={ownerSettings.firstName}
+                      onChange={(e) => setOwnerSettings({ ...ownerSettings, firstName: e.target.value })}
+                      placeholder="Full Name"
+                      className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name
-                </label>
-                <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
-                  <input
-                    type="text"
-                    value={ownerSettings.lastName}
-                    onChange={(e) => setOwnerSettings({ ...ownerSettings, lastName: e.target.value })}
-                    placeholder="Last Name"
-                    className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
-                  />
-                </div>
-              </div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -314,7 +301,7 @@ export default function Settings() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Settings Navigation */}
-        <div ref={navRef} className="lg:w-80 flex-shrink-0">
+        <div ref={navRef} className="2xl:w-80 flex-shrink-0">
           <div className="bg-transparent backdrop-blur-md rounded shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 overflow-hidden">
             {sections.map((section) => {
               const Icon = section.icon;

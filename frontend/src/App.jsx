@@ -28,14 +28,16 @@ function App() {
   
 if (isCheckingAuth) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-2"
+      <div
       style={{
         backgroundImage: "url('/dashboardBg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
       }}
       >
+        <div className="flex flex-col items-center justify-center h-screen gap-2">
         <img
         src="/LinkInsights.svg"
         alt="LinkInsights"
@@ -45,6 +47,7 @@ if (isCheckingAuth) {
       />
 
       <Loader2 className="animate-spin size-10 text-[#052A5E] animate-pulse" />
+        </div>
       </div>
       
     );
@@ -82,15 +85,16 @@ if (isCheckingAuth) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden "
+    <div
     style={{
-      background: "url('/dashboardBg.png')",
+      backgroundImage: "url('/dashboardBg.png')",
       backgroundSize: "cover",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center",
       backgroundAttachment: "fixed",
     }}
     >
+      <div className="flex h-screen overflow-hidden ">
       <ScrollToTop />
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
@@ -133,6 +137,7 @@ if (isCheckingAuth) {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
+      </div>
       </div>
     </div>
   );
