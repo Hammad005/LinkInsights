@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { useDispatch, useSelector } from "react-redux";
 import { login, signup } from "../features/auth/authThunks";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const cardRef = useRef(null);
@@ -231,12 +232,12 @@ export default function Login() {
 
             {isLogin && (
               <div className="flex items-center justify-end">
-                <button
-                  type="button"
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-[#052A5E] hover:text-[#09C1F6] font-medium cursor-pointer"
                 >
                   Forgot Password?
-                </button>
+                </Link>
               </div>
             )}
 

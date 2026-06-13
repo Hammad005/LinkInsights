@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import { useSelector, useDispatch } from 'react-redux';
 import { getMe } from './features/auth/authThunks';
 import { Loader2 } from 'lucide-react';
+import ForgotPassword from './pages/ForgotPassword';
 
 
 function App() {
@@ -78,6 +79,7 @@ if (isCheckingAuth) {
           />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </>

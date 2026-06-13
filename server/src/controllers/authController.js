@@ -171,8 +171,7 @@ export const ResendForgotPasswordOTP = async (req, res) => {
     const now = new Date();
 
     if (
-      user.forgotPasswordOTPExpiry &&
-      user.forgotPasswordOTPExpiry > now - 60 * 1000
+      user.createdAt > now - 60 * 1000
     ) {
       return res
         .status(400)
