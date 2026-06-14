@@ -1,5 +1,5 @@
 import express from 'express';
-import { DeleteUser, ForgotPassword, Login, Logout, Me, ResendForgotPasswordOTP, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData, VerifiyForgotPasswordOTP } from '../controllers/authController.js';
+import { DeleteUser, ForgotPassword, googleLogin, Login, Logout, Me, ResendForgotPasswordOTP, ResetPassword, SendForgetPasswordOTP, Signup, UpdateProfilePic, UpdateUserData, VerifiyForgotPasswordOTP } from '../controllers/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import multerUploadMiddleware from '../middleware/multerUploadMiddleware.js';
 
@@ -9,6 +9,7 @@ const router = express.Router();
 router.get('/me', authMiddleware, Me);
 
 // All Post Requests
+router.post('/google', googleLogin);
 router.post('/signup', Signup);
 router.post('/login', Login);
 router.post('/logout', Logout);

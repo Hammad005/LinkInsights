@@ -8,6 +8,7 @@ import sendEmail from "../lib/nodemailer.js";
 import { forgotPasswordOtpEmailTemplate } from "../utils/emailTemplates.js";
 import Click from "../models/Click.js";
 import Link from "../models/Link.js";
+import { auth } from "../lib/firebaseAdmin.js";
 
 export const Me = async (req, res) => {
   try {
@@ -20,6 +21,42 @@ export const Me = async (req, res) => {
     res.status(500).json({ error: error.message || "Failed to get user" });
   }
 };
+
+export const googleLogin = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(400).json({ error: "No Token Provided" });
+    };
+
+    const token = authHeader.split(" ")[1];
+
+    const decodedToken = await auth.verifyIdToken(token);
+
+    const { uid, name, email, picture } = decodedToken;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        firebaseUid: uid,
+        profileImage: {
+          profileId: null,
+          profileUrl: picture,
+        },
+      });
+    }
+
+    jwtSign(user, res, "7d");
+
+  } catch (error) {
+    console.error("Error in googleLogin:", error);
+    res.status(500).json({ error: error.message || "Failed to login with Google" });
+  }
+}
 
 export const Signup = async (req, res) => {
   try {
@@ -100,6 +137,8 @@ export const SendForgetPasswordOTP = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: "No user found with this email" });
+    } else if (user.firebaseUid) {
+      return res.status(400).json({ error: "This email is registered with Google. Please use Google login." });
     }
 
     const otp = otpGenerator();
@@ -283,6 +322,9 @@ export const UpdateProfilePic = async (req, res) => {
 export const UpdateUserData = async (req, res) => {
   try {
     const { name, email, phone } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: "Name and email are required" });
+    }
     const user = req.user;
     user.name = name || user.name;
     user.email = email || user.email;
@@ -292,7 +334,7 @@ export const UpdateUserData = async (req, res) => {
       .status(200)
       .json({
         message: "Profile updated successfully",
-        userData: { name: user.name, email: user.email },
+        userData: { name: user.name, email: user.email, phone: user.phone },
       });
   } catch (error) {
     console.error("Error updating user data:", error);
@@ -353,6 +395,11 @@ export const DeleteUser = async (req, res) => {
     await Link.deleteMany({
       createdBy: user._id,
     });
+
+    // delete profile pic from cloudinary
+    if (user?.profileImage?.profileId) {
+      await cloudinary.uploader.destroy(user.profileImage.profileId);
+    }
 
     await User.findByIdAndDelete(user._id);
 

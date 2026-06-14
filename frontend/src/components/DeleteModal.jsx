@@ -1,7 +1,7 @@
-import { Trash2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import React from 'react'
 
-const DeleteModal = ({ setShowDeleteModal, title, message }) => {
+const DeleteModal = ({ handleDelete,disableDelete, setShowDeleteModal,  title, message }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6">
@@ -17,16 +17,18 @@ const DeleteModal = ({ setShowDeleteModal, title, message }) => {
 
             <div className="flex gap-3 mt-6">
               <button
+                disabled={disableDelete}
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2.5 text-white bg-red-600 rounded-xl font-medium hover:bg-red-700 transition-colors"
+                disabled={disableDelete}
+                onClick={handleDelete}
+                className="flex-1 flex items-center justify-center px-4 py-2.5 text-white bg-red-600 rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Delete
+                {disableDelete ? (<Loader2 className="animate-spin" />) : "Delete"}
               </button>
             </div>
           </div>

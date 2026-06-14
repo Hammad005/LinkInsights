@@ -20,15 +20,20 @@ import {
   Percent,
   EyeOff,
   Eye,
+  Trash2,
 } from 'lucide-react';
 import gsap from 'gsap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteMyAccount, resetMyPassword, updateProfilePic, updateUserData } from '../features/auth/authThunks';
+import DeleteModal from '../components/DeleteModal';
 
 export default function Settings() {
   const [activeSection, setActiveSection] = useState('Profile');
-  const {user} = useSelector((state) => state.auth);
+  const inputFileRef = useRef(null);
+  const { user, isUpdatingProfilePic, isUpdatingProfile, isUpdatingPassword, isDeletingAccount } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [ownerSettings, setOwnerSettings] = useState({
-    firstName: user?.name,
+    fullname: user?.name,
     email: user?.email,
     phone: user?.phone || '',
   });
@@ -42,6 +47,7 @@ export default function Settings() {
     newPassword: false,
     confirmPassword: false
   })
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [animate, setAnimate] = useState(false);
   const headerRef = useRef(null);
   const navRef = useRef(null);
@@ -50,7 +56,8 @@ export default function Settings() {
 
   const sections = [
     { id: 'Profile', label: 'Profile', icon: User },
-    { id: 'Change Password', label: 'Change Password', icon: Lock },
+    { id: 'Change Password', label: 'Change Password', icon: Lock, hide: user?.firebaseUid },
+    { id: 'Delete Account', label: 'Delete Account', icon: Trash2 },
   ];
 
   useEffect(() => {
@@ -94,6 +101,42 @@ export default function Settings() {
     );
   }, [animate]);
 
+  const handleProfilePicChange = async (e) => {
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("profilePic", file);
+
+    await dispatch(updateProfilePic(data));
+  };
+
+  const handleUserDataUpdate = async () => {
+    const data  = {
+      name: ownerSettings.fullname,
+      email: ownerSettings.email,
+      phone: ownerSettings.phone
+    }
+    await dispatch(updateUserData(data));
+  }
+
+  const handleUserPasswordUpdate = async () => {
+    const data = {
+      oldPassword: passwordSettings.currentPassword,
+      newPassword: passwordSettings.newPassword,
+      confirmPassword: passwordSettings.confirmPassword
+    };
+    await dispatch(resetMyPassword(data)).unwrap();
+      setPasswordSettings({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+  };
+
+  const handleDelete = async () => {
+    await dispatch(deleteMyAccount()).unwrap();
+    setShowDeleteModal(false);
+  };
+
   const renderSection = () => {
     switch (activeSection) {
 
@@ -117,41 +160,54 @@ export default function Settings() {
                 <h3 className="font-semibold text-gray-700">Profile Photo</h3>
                 <p className="text-sm text-gray-500 mb-2">JPG or PNG, max 2MB</p>
                 <button
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#052A5E] rounded-lg hover:bg-[#09C1F6] disabled:bg-[#052A5E]/60 transition-colors cursor-pointer">
-                  Upload Photo
+                  disabled={isUpdatingProfilePic || isUpdatingProfile}
+                  className={`px-4 py-2 text-sm font-medium text-white bg-[#052A5E] rounded-lg hover:bg-[#09C1F6] disabled:bg-[#052A5E]/60 transition-colors ${(isUpdatingProfilePic || isUpdatingProfile) ? 'cursor-not-allowed' : 'cursor-pointer'} ${isUpdatingProfilePic ? 'animate-pulse' : ''}`}
+                  onClick={() => inputFileRef.current?.click()}
+                >
+                  {isUpdatingProfilePic ? "Uploading..." : "Upload Photo"}
                 </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={inputFileRef}
+                  disabled={isUpdatingProfilePic || isUpdatingProfile}
+                  onChange={handleProfilePicChange}
+                  className="hidden"
+                />
               </div>
             </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
-                  <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
-                    <input
-                      type="text"
-                      required
-                      value={ownerSettings.firstName}
-                      onChange={(e) => setOwnerSettings({ ...ownerSettings, firstName: e.target.value })}
-                      placeholder="Full Name"
-                      className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
-                    />
-                  </div>
-                </div>
 
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
+                <input
+                  type="text"
+                  required
+                  value={ownerSettings.fullname}
+                  onChange={(e) => setOwnerSettings({ ...ownerSettings, fullname: e.target.value })}
+                  placeholder="Full Name"
+                  className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  Email {user?.firebaseUid && <span className="text-xs text-gray-500">(Registered with Google)</span>}
                 </label>
                 <div className="relative rounded-xl p-[2px] bg-transparent focus-within:bg-gradient-to-r focus-within:from-[#052A5E] focus-within:to-[#09C1F6] transition-all">
                   <input
                     type="email"
                     required
+                    disabled={user?.firebaseUid} // Disable email input if user is registered with Google
                     value={ownerSettings.email}
                     onChange={(e) => setOwnerSettings({ ...ownerSettings, email: e.target.value })}
                     placeholder="johndoe@email.com"
-                    className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 disabled:opacity-50 focus:border-transparent outline-none"
                   />
                 </div>
               </div>
@@ -166,7 +222,7 @@ export default function Settings() {
                     type="tel"
                     value={ownerSettings.phone}
                     onChange={(e) => setOwnerSettings({ ...ownerSettings, phone: e.target.value })}
-                    placeholder="johndoe@email.com"
+                    placeholder="e.g. +1 234 567 8900"
                     className="w-full px-4 py-3 bg-white rounded-[10px] border border-gray-200 focus:border-transparent outline-none"
                   />
                 </div>
@@ -292,6 +348,16 @@ export default function Settings() {
   };
 
   return (
+    <>
+    {showDeleteModal && (
+      <DeleteModal
+      handleDelete={handleDelete}
+      disableDelete={isDeletingAccount}
+        setShowDeleteModal={setShowDeleteModal}
+        title="Delete Account"
+        message="Are you sure you want to delete your account? This action cannot be undone."
+        />
+    )}
     <div className="space-y-6">
       {/* Page Header */}
       <div ref={headerRef}>
@@ -305,11 +371,19 @@ export default function Settings() {
           <div className="bg-transparent backdrop-blur-md rounded shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.25)] border border-white/20 overflow-hidden">
             {sections.map((section) => {
               const Icon = section.icon;
-              const isActive = activeSection === section.id;
+              const isActive =  activeSection === section.id;
+
+              if (section.hide) {
+                return null;
+              }
               return (
                 <button
                   key={section.id}
                   onClick={() => {
+                    if (section.id === "Delete Account") {
+                      setShowDeleteModal(true);
+                      return;
+                    }
                     setActiveSection(section.id)
                     setAnimate(true)
                   }}
@@ -333,15 +407,24 @@ export default function Settings() {
             {/* Save Button */}
             <div className="mt-8 pt-6 border-t border-white flex justify-end">
               <button
-                className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#052A5E] to-[#09C1F6] text-white rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors duration-300 ease-in-out cursor-pointer"
+                onClick={activeSection === 'Profile' ? handleUserDataUpdate : handleUserPasswordUpdate}
+                disabled={isUpdatingProfilePic || isUpdatingProfile || isUpdatingPassword}
+                className={`flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#052A5E] to-[#09C1F6] text-white rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors duration-300 ease-in-out ${(isUpdatingProfilePic || isUpdatingProfile || isUpdatingPassword) ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${isUpdatingProfile || isUpdatingPassword ? 'animate-pulse' : ''}`}
               >
-                <Save className="w-5 h-5" />
-                Save Changes
+                {isUpdatingProfile || isUpdatingPassword ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    <Save className="w-5 h-5" />
+                    Save Changes
+                  </>
+                )}
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 }
