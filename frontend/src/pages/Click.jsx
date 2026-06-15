@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store, Link2, AtSign, CalendarClock } from "lucide-react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
-import { links } from "../utils/dummyData";
+import { dummylinks } from "../utils/dummyData";
 import toast from "react-hot-toast";
 
 export default function Click() {
@@ -46,7 +46,7 @@ export default function Click() {
 
         // Simulate API call
         setTimeout(() => {
-            if (links.some((link) => link.shortCode === formData.customAlias)) {
+            if (dummylinks.some((link) => link.shortCode === formData.customAlias)) {
                 navigate(`/clicks/${formData.customAlias}`);
                 setIsLoading(false);
                 setErrors({});

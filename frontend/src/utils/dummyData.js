@@ -1,4 +1,4 @@
-export const links = [
+export const dummylinks = [
     {
         originalUrl: "https://www.github.com",
         shortCode: "GH789X",

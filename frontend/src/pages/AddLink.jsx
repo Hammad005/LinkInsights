@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Store, Link2, AtSign, CalendarClock } from "lucide-react";
 import gsap from "gsap";
+import { useDispatch, useSelector } from "react-redux";
+import { createLinkThunk } from "../features/link/linkThunks";
 
 export default function AddLink() {
     const cardRef = useRef(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const {isGeneratingLink} = useSelector((state) => state.link);
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         originalUrl: "",
         customAlias: "",
         expiresIn: "",
     });
+    const dispatch = useDispatch();
 
     const errorValidation = () => {
         const newErrors = {};
@@ -54,25 +57,19 @@ export default function AddLink() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
-        setIsLoading(true);
 
-        if (!errorValidation()) {
-            setIsLoading(false);
-            return;
-        }
+        if (!errorValidation()) return;
 
         // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            setErrors({});
-            setFormData({
-                originalUrl: "",
-                customAlias: "",
-                expiresIn: "",
-            })
-        }, 1000);
+        setErrors({});
+        await dispatch(createLinkThunk(formData)).unwrap();
+        setFormData({
+            originalUrl: "",
+            customAlias: "",
+            expiresIn: "",
+        })
     };
 
 
@@ -98,7 +95,7 @@ export default function AddLink() {
 
     return (
         <div
-            className="flex items-center justify-center min-h-screen h-full pb-25"
+            className="flex items-center justify-center min-h-screen h-full pb-25 mt-10"
         >
             <div className="w-full max-w-md ">
 
@@ -178,10 +175,10 @@ export default function AddLink() {
 
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isGeneratingLink}
                             className="cursor-pointer w-full bg-gradient-to-r from-[#052A5E] to-[#09C1F6] text-white py-3 rounded-xl font-semibold hover:from-[#09C1F6] hover:to-[#052A5E] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                         >
-                            {isLoading ? (
+                            {isGeneratingLink ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>

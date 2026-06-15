@@ -23,13 +23,13 @@ import {
 
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import gsap from "gsap";
-import { links } from "../utils/dummyData";
+import { dummylinks } from "../utils/dummyData";
 
 export default function ClickInner() {
     const { code } = useParams();
     const navigate = useNavigate();
 
-    const clicksData = links.find((link) => link.shortCode === code);
+    const clicksData = dummylinks.find((link) => link.shortCode === code);
     const clicks = clicksData?.clicks || [];
 
     const tableRef = useRef(null);
@@ -44,16 +44,24 @@ export default function ClickInner() {
     const handlePageChange = (page) => {
         setSearchParams((prev) => {
             const params = new URLSearchParams(prev);
-
-            if (page === 1) {
-                params.delete("page");
-            } else {
-                params.set("page", page);
-            }
+            params.set("page", page);
+            params.set("limit", itemsPerPage);
 
             return params;
         });
     };
+
+    useEffect(() => {
+  const page = searchParams.get("page");
+  const limit = searchParams.get("limit");
+
+  if (!page || !limit) {
+    setSearchParams({
+      page: "1",
+      limit: String(itemsPerPage),
+    });
+  }
+}, [searchParams, setSearchParams]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -86,7 +94,7 @@ export default function ClickInner() {
         );
     }, []);
 
-    const shortedURL = import.meta.env.VITE_BASE_URL+clicksData.shortCode
+    const shortedURL = import.meta.env.VITE_BASE_URL+"/"+clicksData.shortCode
 
     return (
         <>
@@ -110,6 +118,9 @@ export default function ClickInner() {
                     <p className="text-[#052A5E]/80 text-sm">
                         <span className="font-semibold">Shorted URL: </span> 
                         <Link to={shortedURL} target="_blank" className="underline">{shortedURL}</Link>
+                    </p>
+                    <p className="text-[#052A5E]/80 text-sm">
+                        <span className="font-semibold">Created At: </span> {formatDate(clicksData?.createdAt)}
                     </p>
                     <p className="text-[#052A5E]/80 text-sm">
                         <span className="font-semibold">Expires At: </span> {formatDate(clicksData?.expiresAt)}

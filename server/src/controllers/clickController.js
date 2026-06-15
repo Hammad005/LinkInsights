@@ -5,7 +5,7 @@ import {UAParser} from 'ua-parser-js';
 
 export const addNewClick = async (req, res) => {
     try {
-        const link = await Link.findOne({ shortCode: '/' + req.params.code });
+        const link = await Link.findOne({ shortCode: req.params.code });
 
         if (!link) return res.status(404).json({ error: "Link not found" });
 

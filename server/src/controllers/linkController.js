@@ -5,12 +5,21 @@ import Click from "../models/Click.js";
 export const createLink = async (req, res) => {
   try {
     const { originalUrl, customAlias, expiresIn } = req.body;
+    if (customAlias.startsWith("/")) {
+      return res.status(400).json({ error: "Custom alias cannot start with /" });
+    }
 
-    const shortCode = customAlias ? customAlias : "/" + nanoid(7);
+    const shortCode = customAlias ? customAlias : nanoid(7);
 
-    const expiresAt = expiresIn
-      ? new Date(Date.now() + expiresIn * 1000) // Convert expiresIn to milliseconds
-      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default to 7 days
+    let expiresAt;
+
+    if (!expiresIn) {
+      expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    } else if (typeof expiresIn === "number") {
+      expiresAt = new Date(Date.now() + expiresIn * 1000);
+    } else {
+      expiresAt = new Date(expiresIn); // ISO string
+    }
 
     // Check if the link already exists
     const existingLink = await Link.findOne({ shortCode });
@@ -26,8 +35,9 @@ export const createLink = async (req, res) => {
     });
 
     return res.status(201).json({
-      shortUrl: `${req.protocol}://${req.get("host")}${newLink.shortCode}`,
+      shortUrl: `${req.protocol}://${req.get("host")}/${newLink.shortCode}`,
       link: newLink,
+      message: "Link generated successfully",
     });
   } catch (error) {
     console.error("Error creating link:", error);
@@ -82,12 +92,14 @@ export const analytics = async (req, res) => {
     }, 0);
 
 
-    const highestClicks =
-      linksWithClicks.length > 0
-        ? linksWithClicks.reduce((prev, current) =>
-          prev.totalClicks > current.totalClicks ? prev : current
-        )
-        : null;
+    const allClicksArray = linksWithClicks.flatMap((day) => day.links);
+
+const highestClicks =
+  allClicksArray.length > 0
+    ? Math.max(
+        ...allClicksArray.map((link) => link.totalClicksOnThisLink || 0)
+      )
+    : 0;
 
     const insights = [];
 
@@ -190,7 +202,7 @@ export const analytics = async (req, res) => {
     res.status(200).json({
       totalLinks: Links.length,
       totalClicksOnLinks: totalClicks,
-      highestClick: highestClicks?.totalClicks || 0,
+      highestClick: highestClicks,
       linksData: linksWithClicks,
       insights
     });
@@ -258,7 +270,7 @@ export const getMyClicks = async (req, res) => {
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    
+
 
     const link = await Link.findOne({
       createdBy: user._id,
@@ -336,6 +348,7 @@ export const deleteLink = async (req, res) => {
 
     return res.status(200).json({
       message: "Link and clicks deleted successfully",
+      linkId: link._id
     });
   } catch (error) {
     console.error("Error deleting link:", error);
