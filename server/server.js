@@ -2,33 +2,64 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./src/database/connectDB.js";
 import "dotenv/config";
+
 import authRoutes from "./src/routes/authRoutes.js";
 import linksRoutes from "./src/routes/linksRoutes.js";
 import { addNewClick } from "./src/controllers/clickController.js";
 
 const app = express();
-const PORT = process.env.PORT || 8080;
 
-// Trust proxy to get real client IP from headers
+const isProd = process.env.NODE_ENV === "production";
+
+/**
+ * Only connect DB once (important for serverless)
+ */
+let isConnected = false;
+const initDB = async () => {
+  if (isConnected) return;
+  await connectDB();
+  isConnected = true;
+};
+
+/**
+ * Middlewares
+ */
 app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: '*',
+    origin: isProd ? process.env.CLIENT_URL : "*",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
-  }),
+  })
 );
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+/**
+ * Routes
+ */
 app.use("/auth", authRoutes);
 app.use("/links", linksRoutes);
-app.use("/:code", addNewClick); // Handle clicks on short URLs
+app.use("/:code", addNewClick);
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server is running on port ${PORT}`);
-});
+/**
+ * IMPORTANT:
+ * Vercel runs serverless → no app.listen()
+ * But locally we still need it
+ */
+if (!isProd) {
+  const PORT = process.env.PORT || 8080;
 
-connectDB();
+  initDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  });
+} else {
+  // Vercel entry point
+  initDB();
+}
+
+export default app;
