@@ -76,7 +76,7 @@ Create a `.env.local` file in the `frontend` directory (never commit this file):
 ### Required Variables
 ```env
 # Backend API Configuration
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5000
 VITE_BASE_URL=http://localhost:5173
 ```
 
@@ -89,6 +89,7 @@ VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
+VITE_MEASUREMENT_ID=
 ```
 
 ### Variable Explanation
@@ -315,7 +316,7 @@ export default {
 ### API Connection Fails
 ```bash
 # Verify backend is running:
-curl http://localhost:5000/api
+curl http://localhost:5000
 
 # Check VITE_API_BASE_URL in .env.local
 # Should match backend server URL
