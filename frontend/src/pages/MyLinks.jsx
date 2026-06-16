@@ -161,7 +161,7 @@ export default function MyLinks() {
         </div>
 
         {/* Orders Table */}
-        {allLinks?.length > 0 ? (
+        {allLinks?.links?.length > 0 ? (
           <div
             ref={tableRef}
             className={`bg-transparent backdrop-blur-md rounded-2xl shadow-lg border border-white/30 overflow-hidden ${isGettingLinks && "animate-pulse pointer-events-none"}`}

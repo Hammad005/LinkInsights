@@ -1,5 +1,7 @@
 # LinkInsights
 
+![Demo App](/frontend/public/LinkInsights_post.png)
+
 LinkInsights is a full-stack URL shortening and analytics platform that allows users to create shortened links, track clicks, and analyze link performance with detailed insights.
 
 ## 🌟 Features
