@@ -14,11 +14,32 @@ export const createLink = async (req, res) => {
     let expiresAt;
 
     if (!expiresIn) {
+      // Default: 7 days
       expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     } else if (typeof expiresIn === "number") {
+      // expiresIn = seconds from now
+      if (expiresIn <= 0) {
+        return res
+          .status(400)
+          .json({ error: "Expiration duration must be greater than 0" });
+      }
+
       expiresAt = new Date(Date.now() + expiresIn * 1000);
     } else {
-      expiresAt = new Date(expiresIn); // ISO string
+      // expiresIn = ISO date string
+      const expirationDate = new Date(expiresIn);
+
+      if (isNaN(expirationDate.getTime())) {
+        return res.status(400).json({ error: "Invalid expiration date" });
+      }
+
+      if (expirationDate <= new Date()) {
+        return res
+          .status(400)
+          .json({ error: "Expiration date must be in the future" });
+      }
+
+      expiresAt = expirationDate;
     }
 
     // Check if the link already exists
@@ -94,12 +115,12 @@ export const analytics = async (req, res) => {
 
     const allClicksArray = linksWithClicks.flatMap((day) => day.links);
 
-const highestClicks =
-  allClicksArray.length > 0
-    ? Math.max(
-        ...allClicksArray.map((link) => link.totalClicksOnThisLink || 0)
-      )
-    : 0;
+    const highestClicks =
+      allClicksArray.length > 0
+        ? Math.max(
+          ...allClicksArray.map((link) => link.totalClicksOnThisLink || 0)
+        )
+        : 0;
 
     const insights = [];
 
@@ -264,8 +285,8 @@ export const getMyLinks = async (req, res) => {
 export const getMyClicks = async (req, res) => {
   try {
     const user = req.user;
-    const { shortCode } = req.body;
-
+    
+    const shortCode = req.query.shortCode;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -274,7 +295,7 @@ export const getMyClicks = async (req, res) => {
 
     const link = await Link.findOne({
       createdBy: user._id,
-      shortCode: `/${shortCode}`,
+      shortCode: shortCode,
     });
 
     if (!link) {
@@ -286,6 +307,12 @@ export const getMyClicks = async (req, res) => {
     const totalClicks = await Click.countDocuments({
       linkId: link.shortCode,
     });
+    
+    if (totalClicks === 0) {
+      return res.status(404).json({
+        error: "There are no clicks for this link",
+      });
+    }
 
     const clicks = await Click.find({
       linkId: link.shortCode,

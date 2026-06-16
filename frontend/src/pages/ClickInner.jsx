@@ -23,25 +23,31 @@ import {
 
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import gsap from "gsap";
-import { dummylinks } from "../utils/dummyData";
+import { useDispatch, useSelector } from "react-redux";
+import { getMyClicksThunk } from "../features/link/linkThunks";
 
 export default function ClickInner() {
+    const {allClicks, isGettingClicks} = useSelector((state) => state.link);
+    const dispatch = useDispatch();
     const { code } = useParams();
     const navigate = useNavigate();
 
-    const clicksData = dummylinks.find((link) => link.shortCode === code);
-    const clicks = clicksData?.clicks || [];
+    useEffect(() => {
+      if(code !== allClicks?.link?.shortCode) {
+        navigate('/click')
+      }
+      
+    }, [])
+    
+
+    
 
     const tableRef = useRef(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const currentPage = Number(searchParams.get("page")) || 1;
     const itemsPerPage = 3;
-    const totalPages = Math.ceil(clicks.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
 
-    const currentLinks = clicks.slice(startIndex, startIndex + itemsPerPage);
-
-    const handlePageChange = (page) => {
+    const handlePageChange = async (page) => {
         setSearchParams((prev) => {
             const params = new URLSearchParams(prev);
             params.set("page", page);
@@ -49,6 +55,8 @@ export default function ClickInner() {
 
             return params;
         });
+
+        await dispatch(getMyClicksThunk({data: code, page: page, limit: 3}));
     };
 
     useEffect(() => {
@@ -94,7 +102,7 @@ export default function ClickInner() {
         );
     }, []);
 
-    const shortedURL = import.meta.env.VITE_BASE_URL+"/"+clicksData.shortCode
+    const shortedURL = import.meta.env.VITE_BASE_URL+"/"+allClicks?.link?.shortCode
 
     return (
         <>
@@ -106,24 +114,24 @@ export default function ClickInner() {
                 <div className="flex flex-wrap justify-between gap-4">
                     <div>
                         
-                    <h1 className="text-2xl md:text-3xl font-bold text-[#052A5E]">Clicks Overview of: {clicksData?.shortCode}</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-[#052A5E]">Clicks Overview of: {allClicks?.link?.shortCode}</h1>
 
                     <p className="text-[#052A5E]/80 mt-1 text-sm">
                         <span className="font-semibold">Original URL: </span> 
-                        <Link to={clicksData?.originalUrl} target="_blank" className="underline">{clicksData?.originalUrl}</Link>
+                        <Link to={allClicks?.link?.originalUrl} target="_blank" className="underline">{allClicks?.link?.originalUrl}</Link>
                     </p>
                     <p className="text-[#052A5E]/80 text-sm">
-                        <span className="font-semibold">Short Code: </span> {clicksData?.shortCode}
+                        <span className="font-semibold">Short Code: </span> {allClicks?.link?.shortCode}
                     </p>
                     <p className="text-[#052A5E]/80 text-sm">
                         <span className="font-semibold">Shorted URL: </span> 
                         <Link to={shortedURL} target="_blank" className="underline">{shortedURL}</Link>
                     </p>
                     <p className="text-[#052A5E]/80 text-sm">
-                        <span className="font-semibold">Created At: </span> {formatDate(clicksData?.createdAt)}
+                        <span className="font-semibold">Created At: </span> {formatDate(allClicks?.link?.createdAt)}
                     </p>
                     <p className="text-[#052A5E]/80 text-sm">
-                        <span className="font-semibold">Expires At: </span> {formatDate(clicksData?.expiresAt)}
+                        <span className="font-semibold">Expires At: </span> {formatDate(allClicks?.link?.expiresAt)}
                     </p>
                     </div>
                     <button 
@@ -137,7 +145,7 @@ export default function ClickInner() {
                 {/* Orders Table */}
                 <div
                     ref={tableRef}
-                    className="bg-transparent backdrop-blur-md rounded-2xl shadow-lg border border-white/30 overflow-hidden ">
+                    className={`bg-transparent backdrop-blur-md rounded-2xl shadow-lg border border-white/30 overflow-hidden ${isGettingClicks ? "animate-pulse" : ""}`}>
                     <div className="overflow-x-auto "
                         style={{
                             scrollBehavior: "smooth",
@@ -171,10 +179,10 @@ export default function ClickInner() {
                             </thead>
 
                             <tbody>
-                                {currentLinks.map((order) => {
+                                {allClicks?.clicks?.map((order) => {
                                     return (
                                         <tr
-                                            key={order.shortCode}
+                                            key={order._id}
                                             className="border-b border-white shadow hover:bg-white/50"
                                         >
                                             <td className="py-4 px-6">
@@ -219,17 +227,17 @@ export default function ClickInner() {
                     {/* Pagination */}
                     <div className="px-6 py-4 bg-[#052A5E]/20 backdrop-blur-md border-t border-white shadow flex flex-wrap items-center sm:justify-between justify-center gap-3">
                         <p className="text-sm text-white">
-                            Showing {startIndex + 1} - {startIndex + currentLinks.length} of {clicks.length} results
+                            Showing {allClicks?.currentPage} - {allClicks?.totalPages} of {allClicks?.totalClicks} results
                         </p>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
+                                disabled={!allClicks?.hasPrevPage}
                                 className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
                                 Previous
                             </button>
 
-                            {Array.from({ length: totalPages }, (_, index) => (
+                            {Array.from({ length: allClicks?.totalPages }, (_, index) => (
                                 <button
                                     key={index + 1}
                                     onClick={() => handlePageChange(index + 1)}
@@ -242,7 +250,7 @@ export default function ClickInner() {
 
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
+                                disabled={!allClicks?.hasNextPage}
                                 className="px-3 py-1.5 text-sm text-white bg-[#09C1F6] rounded-lg hover:bg-[#09c3f6bd] transition-colors disabled:opacity-50">
                                 Next
                             </button>

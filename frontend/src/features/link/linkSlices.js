@@ -12,9 +12,9 @@ const initialState = {
   isGettingAnalytics: false,
   analytics: [],
   isGettingLinks: false,
-  allLinks: [],
+  allLinks: { links: [], currentPage: 1, totalPages: 1, totalLinks: 0, hasNextPage: false, hasPrevPage: false },
   isGettingClicks: false,
-  clicks: [],
+  allClicks: { clicks: [], link: null, currentPage: 1, totalPages: 1, totalClicks: 0, hasNextPage: false, hasPrevPage: false },
   isDeletingLink: false,
   error: null,
   message: null,
@@ -24,7 +24,7 @@ export const linkSlice = createSlice({
   name: "links",
   initialState,
   reducers: {
-    // Define your reducers here
+    resetLinksState: () => initialState,
   },
   extraReducers: (builder) => {
     // Create Link
@@ -73,7 +73,7 @@ export const linkSlice = createSlice({
       })
       .addCase(getMyClicksThunk.fulfilled, (state, action) => {
         state.isGettingClicks = false;
-        state.clicks = action.payload.clicks;
+        state.allClicks = action.payload;
       })
       .addCase(getMyClicksThunk.rejected, (state, action) => {
         state.isGettingClicks = false;
@@ -86,9 +86,14 @@ export const linkSlice = createSlice({
       })
       .addCase(deleteLinkThunk.fulfilled, (state, action) => {
         state.isDeletingLink = false;
-        state.links = state.links.filter(
+        // remove the deleted link from the `allLinks.links` array
+        state.allLinks.links = (state.allLinks.links || []).filter(
           (link) => link._id !== action.payload.linkId,
         );
+        // optionally adjust totalLinks
+        if (typeof state.allLinks.totalLinks === "number") {
+          state.allLinks.totalLinks = Math.max(0, state.allLinks.totalLinks - 1);
+        }
       })
       .addCase(deleteLinkThunk.rejected, (state, action) => {
         state.isDeletingLink = false;
@@ -97,4 +102,5 @@ export const linkSlice = createSlice({
   },
 });
 
+export const { resetLinksState } = linkSlice.actions;
 export default linkSlice.reducer;

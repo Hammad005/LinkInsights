@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { deleteUser, forgotPassword, loginUser, me, registerUser, resendOTP, resetPassword, sendOTP, updatePP, updateUD, verifiyOTP } from "./authServices";
 import toast from "react-hot-toast";
+import { resetLinksState } from "../link/linkSlices";
 
 
 export const getMe = createAsyncThunk(
@@ -50,6 +51,7 @@ export const logout = createAsyncThunk(
     "auth/logout",
     async (_, thunkAPI) => {
         try {
+            thunkAPI.dispatch(resetLinksState());
             localStorage.removeItem('Bearer-Token');
             toast.success('Logout successful');
             return;
@@ -164,6 +166,7 @@ export const deleteMyAccount = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const res = await deleteUser();
+            thunkAPI.dispatch(resetLinksState());
             toast.success(res.data.message);
             return res.data;
         } catch (error) {

@@ -35,7 +35,7 @@ export const getMyLinksThunk = createAsyncThunk(
       const res = await getMyLinks(page, limit);
       return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   },
@@ -48,7 +48,7 @@ export const getMyClicksThunk = createAsyncThunk(
       const res = await getMyClicks(data, page, limit);
       return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   },
@@ -62,7 +62,7 @@ export const deleteLinkThunk = createAsyncThunk(
       toast.success(res.data.message);
       return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   },

@@ -226,14 +226,14 @@ export default function Dashboard() {
                 fillOpacity={1}
                 fill="url(#colorRevenue)"
               />
-              <Area
+              {/* <Area
                 type="monotone"
                 dataKey="links"
                 stroke="#09C1F6"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorRevenue)"
-              />
+              /> */}
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -241,7 +241,7 @@ export default function Dashboard() {
 
       <div ref={bottomRef} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Insights */}
-        <div className="rounded-2xl p-6 bg-[#09C1F6]/10 backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.2)] border border-white/20">
+        {analytics?.insights && <div className="rounded-2xl p-6 bg-[#09C1F6]/10 backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.2)] border border-white/20">
           <h2 className="mb-2 text-lg font-semibold text-[#052A5E]">
             Insights
           </h2>
@@ -263,10 +263,10 @@ export default function Dashboard() {
             ))
           )
           }
-        </div>
+        </div>}
 
         {/* Quick Actions */}
-        <div className="xl:col-span-2 bg-gradient-to-r from-[#052a5e] to-[#09c3f652] rounded-2xl p-6 text-white flex backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.5)] border border-white/20">
+        <div className={`${analytics?.insights ? "xl:col-span-2" : "xl:col-span-3"} bg-gradient-to-r from-[#052a5e] to-[#09c3f652] rounded-2xl p-6 text-white flex backdrop-blur-md shadow-[2px_4px_8px_0_rgba(0,0,0,0.3),inset_2px_4px_8px_0_rgba(0,0,0,0.5)] border border-white/20`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
             <div>
               <h3 className="text-xl font-bold">Ready to get started?</h3>
