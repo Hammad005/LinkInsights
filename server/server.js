@@ -24,7 +24,7 @@ const initDB = async () => {
 /**
  * Middlewares
  */
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 app.use(
   cors({

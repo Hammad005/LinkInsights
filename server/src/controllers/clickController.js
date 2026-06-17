@@ -1,7 +1,7 @@
 import Link from '../models/Link.js';
 import Click from '../models/Click.js';
 import geoip from 'geoip-lite';
-import { UAParser } from 'ua-parser-js';
+import {UAParser} from 'ua-parser-js';
 
 export const addNewClick = async (req, res) => {
     try {
@@ -15,28 +15,18 @@ export const addNewClick = async (req, res) => {
         }
 
         // Ip - Extract real client IP (handles proxy/load balancer scenarios)
-        // const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
-        //            req.headers['x-real-ip'] || 
-        //            req.ip || 
-        //            req.connection.remoteAddress;
-
-
-        const getClientIp = (req) => {
-            const forwarded = req.headers["x-forwarded-for"];
-
-            if (forwarded) {
-                return forwarded.split(",")[0].trim();
-            }
-
-            return req.socket?.remoteAddress || req.ip;
-        };
-
-        const ip = getClientIp(req);
-
-
-        // Geo Location
-        const geo = geoip.lookup(ip);
-
+        const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                   req.headers['x-real-ip'] || 
+                   req.ip || 
+                   req.connection.remoteAddress;
+        
+        
+        let country = req.headers['x-vercel-ip-country'];
+        if (!country) {
+            const geo = geoip.lookup(ip);
+            country = geo?.country || "Unknown";
+        }
+        
 
         // Device Info
         const parser = new UAParser(req.headers['user-agent']);
@@ -47,7 +37,7 @@ export const addNewClick = async (req, res) => {
         await Click.create({
             linkId: link.shortCode,
             ipAddress: ip,
-            country: geo?.country || "Unknown",
+            country,
             device: ua.device.type || "desktop",
             browser: ua.browser.name,
             referrer: req.headers.referer || "direct",
