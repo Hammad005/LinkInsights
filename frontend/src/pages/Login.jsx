@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, signup } from "../features/auth/authThunks";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { signInWithPopup } from "firebase/auth";
-import { auth, createGoogleProvider } from "../services/firebase";
-import axios from "axios";
-import { setIsAuthenticated, setUser } from "../features/auth/authSlices";
+// import { signInWithPopup } from "firebase/auth";
+// import { auth, createGoogleProvider } from "../services/firebase";
+// import axios from "axios";
+// import { setIsAuthenticated, setUser } from "../features/auth/authSlices";
 
 export default function Login() {
   const cardRef = useRef(null);
@@ -80,31 +80,31 @@ export default function Login() {
   );
 }, []);
 
-const handleGoogleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, createGoogleProvider());
-    const user = result.user;
+// const handleGoogleLogin = async () => {
+//   try {
+//     const result = await signInWithPopup(auth, createGoogleProvider());
+//     const user = result.user;
 
-    const token = await user.getIdToken();
+//     const token = await user.getIdToken();
 
-    const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/google`, {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+//     const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/google`, {},
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
 
-    localStorage.setItem('Bearer-Token', response.data.accessToken);
-    dispatch(setIsAuthenticated(true));
-    dispatch(setUser(response.data.user));
-    toast.success('Login successful');
-  } catch (error) {
-    toast.error(error.response?.data?.error || 'Google login failed');
-    dispatch(setIsAuthenticated(false));
-    dispatch(setUser(null));
-  }
-};
+//     localStorage.setItem('Bearer-Token', response.data.accessToken);
+//     dispatch(setIsAuthenticated(true));
+//     dispatch(setUser(response.data.user));
+//     toast.success('Login successful');
+//   } catch (error) {
+//     toast.error(error.response?.data?.error || 'Google login failed');
+//     dispatch(setIsAuthenticated(false));
+//     dispatch(setUser(null));
+//   }
+// };
 
   return (
     <div
@@ -288,16 +288,16 @@ const handleGoogleLogin = async () => {
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
+          {/* <div className="relative my-6">
             <div className="relative flex justify-center text-sm">
               <span className="bg-transparent backdrop-blur-md px-2 text-gray-500">
                 or continue with
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Social Login */}
-          <button 
+          {/* <button 
           onClick={handleGoogleLogin}
           className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors w-full">
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -319,7 +319,7 @@ const handleGoogleLogin = async () => {
               />
             </svg>
             <span className="text-sm font-medium text-gray-600">Google</span>
-          </button>
+          </button> */}
         </div>
 
         <p className="text-center text-white text-sm mt-6">

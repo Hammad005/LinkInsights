@@ -8,7 +8,7 @@ import sendEmail from "../lib/nodemailer.js";
 import { forgotPasswordOtpEmailTemplate } from "../utils/emailTemplates.js";
 import Click from "../models/Click.js";
 import Link from "../models/Link.js";
-import { auth } from "../lib/firebaseAdmin.js";
+// import { auth } from "../lib/firebaseAdmin.js";
 
 export const Me = async (req, res) => {
   try {
@@ -22,41 +22,41 @@ export const Me = async (req, res) => {
   }
 };
 
-export const googleLogin = async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
+// export const googleLogin = async (req, res) => {
+//   try {
+//     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      return res.status(400).json({ error: "No Token Provided" });
-    };
+//     if (!authHeader) {
+//       return res.status(400).json({ error: "No Token Provided" });
+//     };
 
-    const token = authHeader.split(" ")[1];
+//     const token = authHeader.split(" ")[1];
 
-    const decodedToken = await auth.verifyIdToken(token);
+//     const decodedToken = await auth.verifyIdToken(token);
 
-    const { uid, name, email, picture } = decodedToken;
+//     const { uid, name, email, picture } = decodedToken;
 
-    let user = await User.findOne({ email });
+//     let user = await User.findOne({ email });
 
-    if (!user) {
-      user = await User.create({
-        name,
-        email,
-        firebaseUid: uid,
-        profileImage: {
-          profileId: null,
-          profileUrl: picture,
-        },
-      });
-    }
+//     if (!user) {
+//       user = await User.create({
+//         name,
+//         email,
+//         firebaseUid: uid,
+//         profileImage: {
+//           profileId: null,
+//           profileUrl: picture,
+//         },
+//       });
+//     }
 
-    jwtSign(user, res, "7d");
+//     jwtSign(user, res, "7d");
 
-  } catch (error) {
-    console.error("Error in googleLogin:", error);
-    res.status(500).json({ error: error.message || "Failed to login with Google" });
-  }
-}
+//   } catch (error) {
+//     console.error("Error in googleLogin:", error);
+//     res.status(500).json({ error: error.message || "Failed to login with Google" });
+//   }
+// }
 
 export const Signup = async (req, res) => {
   try {
