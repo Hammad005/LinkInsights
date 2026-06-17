@@ -6,12 +6,9 @@ package-lock.json
 yarn.lock
 
 # Environment variables
-.env
-.env.local
 .env.*.local
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -36,3 +33,4 @@ logs/
 tmp/
 temp/
 *.tmp
+config.bat
