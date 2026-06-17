@@ -24,7 +24,7 @@ const initDB = async () => {
 /**
  * Middlewares
  */
-app.set("trust proxy", 1);
+app.set("trust proxy", true);
 
 app.use(
   cors({
@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
  */
 app.use("/auth", authRoutes);
 app.use("/links", linksRoutes);
-app.use("/:code", addNewClick);
+app.get("/:code", addNewClick);
 
 /**
  * IMPORTANT:
